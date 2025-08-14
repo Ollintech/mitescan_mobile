@@ -34,19 +34,27 @@ function MainTabs() {
           backgroundColor: '#fff',
           borderTopWidth: 1,
           borderTopColor: '#eee',
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
         },
         headerStyle: {
           backgroundColor: '#fff',
         },
         headerTintColor: '#333',
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
       }}
     >
       <Tab.Screen 
-        name="Home" 
+        name="Dashboard" 
         component={HomeScreen}
         options={{
+          title: 'Dashboard',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="home" color={color} size={size} />
+            <TabIcon name="dashboard" color={color} size={size} />
           ),
         }}
       />
@@ -54,8 +62,9 @@ function MainTabs() {
         name="Colmeias" 
         component={BeehiveListScreen}
         options={{
+          title: 'Colmeias',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="list" color={color} size={size} />
+            <TabIcon name="beehive" color={color} size={size} />
           ),
         }}
       />
@@ -63,6 +72,7 @@ function MainTabs() {
         name="Mapa" 
         component={MapScreen}
         options={{
+          title: 'Mapa',
           tabBarIcon: ({ color, size }) => (
             <TabIcon name="map" color={color} size={size} />
           ),
@@ -72,17 +82,29 @@ function MainTabs() {
         name="Análises" 
         component={AnalysisScreen}
         options={{
+          title: 'Análises',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="analytics" color={color} size={size} />
+            <TabIcon name="analysis" color={color} size={size} />
           ),
         }}
       />
       <Tab.Screen 
-        name="Perfil" 
+        name="Histórico" 
+        component={HistoryScreen}
+        options={{
+          title: 'Histórico',
+          tabBarIcon: ({ color, size }) => (
+            <TabIcon name="history" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen 
+        name="Usuários" 
         component={UsersScreen}
         options={{
+          title: 'Usuários',
           tabBarIcon: ({ color, size }) => (
-            <TabIcon name="person" color={color} size={size} />
+            <TabIcon name="users" color={color} size={size} />
           ),
         }}
       />
@@ -95,11 +117,12 @@ function TabIcon({ name, color, size }) {
   return (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Text style={{ fontSize: size * 0.8, color: color }}>
-        {name === 'home' && '🏠'}
-        {name === 'list' && '📋'}
+        {name === 'dashboard' && '🏠'}
+        {name === 'beehive' && '🐝'}
         {name === 'map' && '🗺️'}
-        {name === 'analytics' && '🔬'}
-        {name === 'person' && '👤'}
+        {name === 'analysis' && '🔬'}
+        {name === 'history' && '📊'}
+        {name === 'users' && '👥'}
       </Text>
     </View>
   );
@@ -115,14 +138,23 @@ export default function App() {
           headerShown: false,
         }}
       >
+        {/* Telas de Autenticação */}
         <Stack.Screen name="Loading" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
+        
+        {/* Navegação Principal com Tabs */}
         <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen name="BeehiveEdit" component={BeehiveEditScreen} />
+        
+        {/* Telas de Gestão de Colmeias */}
         <Stack.Screen name="BeehiveRegister" component={BeehiveRegisterScreen} />
+        <Stack.Screen name="BeehiveEdit" component={BeehiveEditScreen} />
+        
+        {/* Telas de Funcionalidades */}
         <Stack.Screen name="Camera" component={CameraScreen} />
         <Stack.Screen name="History" component={HistoryScreen} />
+        
+        {/* Telas de Gestão de Usuários */}
         <Stack.Screen name="UserEdit" component={UserEditScreen} />
       </Stack.Navigator>
     </NavigationContainer>
