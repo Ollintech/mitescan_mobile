@@ -113,23 +113,6 @@ export default function HomeScreen({ navigation }) {
             </View>
           ))}
         </View>
-
-        {/* Botões de Ação Rápida */}
-        <View style={styles.quickActions}>
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('BeehiveRegister')}
-          >
-            <Text style={styles.actionButtonText}>+ Nova Colmeia</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('Analysis')}
-          >
-            <Text style={styles.actionButtonText}>🔬 Nova Análise</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </View>
   );
@@ -273,28 +256,5 @@ const styles = StyleSheet.create({
   },
   statusIcon: {
     fontSize: 24,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 30,
-  },
-  actionButton: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 25,
-    flex: 0.48,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-  },
-  actionButtonText: {
-    color: '#000',
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontSize: 14,
   },
 });
