@@ -10,7 +10,8 @@ export default function BeehiveRegisterScreen({ navigation }) {
     description: '',
     type: '',
     capacity: '',
-    installationDate: ''
+    installationDate: '',
+    coordinates: null // Adicionando coordenadas
   });
 
   const handleInputChange = (field, value) => {
@@ -43,7 +44,16 @@ export default function BeehiveRegisterScreen({ navigation }) {
   };
 
   const handleSelectLocation = () => {
-    Alert.alert('Localização', 'Funcionalidade de GPS em desenvolvimento');
+    // Navega para a tela de mapa para selecionar localização
+    navigation.navigate('Map', {
+      onLocationSelect: (coordinates, address) => {
+        setFormData(prev => ({
+          ...prev,
+          coordinates: coordinates,
+          location: address
+        }));
+      }
+    });
   };
 
   return (

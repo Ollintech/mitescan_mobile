@@ -3,8 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'rea
 
 const { width, height } = Dimensions.get('window');
 
-export default function MapScreen({ navigation }) {
+export default function MapScreen({ navigation, route }) {
   const [selectedLocation, setSelectedLocation] = useState(null);
+  
+  // Verifica se é uma tela de seleção de localização
+  const isLocationSelection = route.params?.onLocationSelect;
   
   // Dados mockados das colmeias no mapa
   const beehiveLocations = [
@@ -25,32 +28,76 @@ export default function MapScreen({ navigation }) {
   };
 
   const handleLocationPress = (location) => {
-    setSelectedLocation(location);
-    Alert.alert(
-      location.name,
-      `Status: ${location.status === 'healthy' ? 'Saudável' : location.status === 'warning' ? 'Atenção' : 'Crítica'}`,
-      [
-        { text: 'Ver Detalhes', onPress: () => navigation.navigate('BeehiveEdit', { beehive: { id: location.id, name: location.name } }) },
-        { text: 'Fechar', style: 'cancel' }
-      ]
-    );
+    if (isLocationSelection) {
+      // Se for seleção de localização, seleciona o ponto
+      setSelectedLocation(location);
+    } else {
+      // Comportamento normal da tela de mapa
+      setSelectedLocation(location);
+      Alert.alert(
+        location.name,
+        `Status: ${location.status === 'healthy' ? 'Saudável' : location.status === 'warning' ? 'Atenção' : 'Crítica'}`,
+        [
+          { text: 'Ver Detalhes', onPress: () => navigation.navigate('BeehiveEdit', { beehive: { id: location.id, name: location.name } }) },
+          { text: 'Fechar', style: 'cancel' }
+        ]
+      );
+    }
+  };
+
+  const handleMapPress = (event) => {
+    if (isLocationSelection) {
+      // Calcula as coordenadas baseadas na posição do toque
+      const { locationX, locationY } = event.nativeEvent;
+      const coordinates = {
+        latitude: (locationY / height) * 100, // Coordenadas mockadas
+        longitude: (locationX / width) * 100
+      };
+      
+      // Endereço mockado baseado na posição
+      const address = `Localização selecionada (${coordinates.latitude.toFixed(2)}, ${coordinates.longitude.toFixed(2)})`;
+      
+      setSelectedLocation({ x: locationX, y: locationY, coordinates, address });
+    }
+  };
+
+  const handleConfirmLocation = () => {
+    if (selectedLocation && isLocationSelection) {
+      const { coordinates, address } = selectedLocation;
+      route.params.onLocationSelect(coordinates, address);
+      navigation.goBack();
+    }
   };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Mapa das Colmeias</Text>
         <TouchableOpacity 
-          style={styles.addButton}
-          onPress={() => navigation.navigate('BeehiveRegister')}
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          <Text style={styles.addButtonText}>+</Text>
+          <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>
+          {isLocationSelection ? 'Selecionar Localização' : 'Mapa das Colmeias'}
+        </Text>
+        {!isLocationSelection && (
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => navigation.navigate('BeehiveRegister')}
+          >
+            <Text style={styles.addButtonText}>+</Text>
+          </TouchableOpacity>
+        )}
       </View>
       
       {/* Área do mapa */}
-      <View style={styles.mapContainer}>
+      <TouchableOpacity 
+        style={styles.mapContainer} 
+        activeOpacity={1}
+        onPress={handleMapPress}
+      >
         {/* Fundo do mapa */}
         <View style={styles.mapBackground}>
           {/* Grade do mapa */}
@@ -63,7 +110,7 @@ export default function MapScreen({ navigation }) {
             ))}
           </View>
           
-          {/* Marcadores das colmeias */}
+          {/* Marcadores das colmeias existentes */}
           {beehiveLocations.map((location) => (
             <TouchableOpacity
               key={location.id}
@@ -81,14 +128,41 @@ export default function MapScreen({ navigation }) {
             </TouchableOpacity>
           ))}
           
+          {/* Marcador de localização selecionada */}
+          {selectedLocation && isLocationSelection && (
+            <View style={[
+              styles.selectedLocationMarker,
+              {
+                left: selectedLocation.x - 20,
+                top: selectedLocation.y - 20,
+              }
+            ]}>
+              <Text style={styles.selectedLocationText}>📍</Text>
+            </View>
+          )}
+          
           {/* Marcador de localização atual */}
           <View style={styles.currentLocationMarker}>
             <Text style={styles.currentLocationText}>📍</Text>
             <Text style={styles.currentLocationLabel}>Você está aqui</Text>
           </View>
         </View>
-        
-        {/* Legenda */}
+      </TouchableOpacity>
+      
+      {/* Botão de confirmação para seleção de localização */}
+      {isLocationSelection && selectedLocation && (
+        <View style={styles.confirmationContainer}>
+          <TouchableOpacity 
+            style={styles.confirmButton}
+            onPress={handleConfirmLocation}
+          >
+            <Text style={styles.confirmButtonText}>Confirmar Localização</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      
+      {/* Legenda */}
+      {!isLocationSelection && (
         <View style={styles.legend}>
           <Text style={styles.legendTitle}>Legenda</Text>
           <View style={styles.legendItems}>
@@ -106,31 +180,7 @@ export default function MapScreen({ navigation }) {
             </View>
           </View>
         </View>
-      </View>
-      
-      {/* Botões de ação */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => Alert.alert('GPS', 'Ativando GPS...')}
-        >
-          <Text style={styles.actionButtonText}>📍 GPS</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => Alert.alert('Zoom', 'Ajustando zoom...')}
-        >
-          <Text style={styles.actionButtonText}>🔍 Zoom</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={() => navigation.navigate('BeehiveRegister')}
-        >
-          <Text style={styles.actionButtonText}>➕ Nova</Text>
-        </TouchableOpacity>
-      </View>
+      )}
     </View>
   );
 }
@@ -151,10 +201,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
+  backButton: {
+    padding: 10,
+  },
+  backButtonText: {
+    fontSize: 24,
+    color: '#333',
+  },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
+    flex: 1,
+    textAlign: 'center',
   },
   addButton: {
     backgroundColor: '#FFD700',
@@ -222,6 +281,48 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 5,
   },
+  selectedLocationMarker: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 2,
+    borderColor: '#FFD700',
+  },
+  selectedLocationText: {
+    fontSize: 24,
+    color: '#FFD700',
+  },
+  confirmationContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#FFD700',
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  confirmButton: {
+    backgroundColor: '#333',
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   legend: {
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -255,24 +356,5 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 12,
     color: '#666',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-  },
-  actionButton: {
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 10,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  actionButtonText: {
-    color: '#333',
-    fontSize: 14,
-    fontWeight: '600',
   },
 });
