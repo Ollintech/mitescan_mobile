@@ -52,13 +52,13 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       {/* Header Amarelo */}
       <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoMite}>MITE</Text>
-          <Text style={styles.logoScan}>SCAN</Text>
+        <View style={styles.headerContent}>
+          <Image 
+            source={require('../../assets/ms-icon.png')} 
+            style={styles.headerIcon}
+            resizeMode="contain"
+          />
         </View>
-        <TouchableOpacity style={styles.menuButton}>
-          <Text style={styles.menuIcon}>☰</Text>
-        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -129,33 +129,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingTop: 30,
+    paddingBottom: 15,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
-  logoContainer: {
-    alignItems: 'flex-start',
+  headerContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  logoMite: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  logoScan: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  menuButton: {
-    padding: 10,
-  },
-  menuIcon: {
-    fontSize: 24,
-    color: '#000',
+  headerIcon: {
+    width: 80,
+    height: 80,
   },
   content: {
     flex: 1,

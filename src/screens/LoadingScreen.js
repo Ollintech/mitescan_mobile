@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Animated, Easing } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Animated, Easing, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
@@ -7,58 +7,59 @@ const { width, height } = Dimensions.get('window');
 export default function LoadingScreen({ navigation }) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  const rotateAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
-  const honeycombAnim = useRef(new Animated.Value(0)).current;
+  const slideTopAnim = useRef(new Animated.Value(-100)).current;
+  const slideBottomAnim = useRef(new Animated.Value(100)).current;
+  const logoScaleAnim = useRef(new Animated.Value(0.5)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Animação de entrada
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 800,
-        easing: Easing.elastic(1),
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 1000,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start();
+    // Sequência de animações
+    const animationSequence = async () => {
+      // 1. Anima as imagens de fundo
+      await new Promise(resolve => {
+        Animated.parallel([
+          Animated.timing(slideTopAnim, {
+            toValue: 0,
+            duration: 1200,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+          Animated.timing(slideBottomAnim, {
+            toValue: 0,
+            duration: 1200,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+        ]).start(resolve);
+      });
 
-    // Animação da barra de progresso
-    Animated.timing(progressAnim, {
-      toValue: 1,
-      duration: 3500,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
+      // 2. Anima o logo principal
+      await new Promise(resolve => {
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(logoScaleAnim, {
+            toValue: 1,
+            duration: 1000,
+            easing: Easing.elastic(1),
+            useNativeDriver: true,
+          }),
+        ]).start(resolve);
+      });
 
-    // Animação contínua da colmeia
-    Animated.loop(
-      Animated.timing(honeycombAnim, {
+      // 3. Anima a barra de progresso
+      Animated.timing(progressAnim, {
         toValue: 1,
-        duration: 3000,
-        useNativeDriver: true,
-      })
-    ).start();
+        duration: 2000,
+        easing: Easing.linear,
+        useNativeDriver: false,
+      }).start();
+    };
 
-    // Animação de rotação contínua
-    Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 20000,
-        useNativeDriver: true,
-      })
-    ).start();
+    animationSequence();
 
     // Navega para o login após 4 segundos
     const timer = setTimeout(() => {
@@ -66,72 +67,54 @@ export default function LoadingScreen({ navigation }) {
     }, 4000);
 
     return () => clearTimeout(timer);
-  }, [navigation, fadeAnim, scaleAnim, slideAnim, honeycombAnim, rotateAnim, progressAnim]);
-
-  const spin = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const honeycombOpacity = honeycombAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.1, 0.2, 0.1],
-  });
+  }, [navigation, fadeAnim, scaleAnim, slideTopAnim, slideBottomAnim, logoScaleAnim, progressAnim]);
 
   const progressWidth = progressAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 200],
+    outputRange: [0, 250],
   });
 
   return (
-    <LinearGradient
-      colors={['#FFD700', '#FFA500', '#FF8C00']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      {/* Padrão de colmeia animado */}
-      <Animated.View style={[styles.honeycombBackground, { opacity: honeycombOpacity }]}>
-        {[...Array(30)].map((_, index) => (
-          <Animated.View 
-            key={index} 
-            style={[
-              styles.honeycombCell, 
-              { 
-                left: (index % 6) * 70 + (index % 2) * 35,
-                top: Math.floor(index / 6) * 60,
-                transform: [{ rotate: spin }],
-              }
-            ]} 
-          />
-        ))}
+    <View style={styles.container}>
+      {/* Imagem superior - canto esquerdo */}
+      <Animated.View 
+        style={[
+          styles.topImageContainer,
+          {
+            transform: [{ translateY: slideTopAnim }]
+          }
+        ]}
+      >
+        <Image 
+          source={require('../../assets/splash-screen/top.png')} 
+          style={styles.topImage}
+          resizeMode="contain"
+        />
       </Animated.View>
-      
-      {/* Logo principal animado */}
+
+      {/* Logo principal centralizado */}
       <Animated.View 
         style={[
           styles.logoContainer,
           {
             opacity: fadeAnim,
-            transform: [
-              { scale: scaleAnim },
-              { translateY: slideAnim }
-            ]
+            transform: [{ scale: logoScaleAnim }]
           }
         ]}
       >
-        <Text style={styles.logoText}>HIVE SCAN</Text>
-        <Text style={styles.logoSubtext}>🐝</Text>
-        <Text style={styles.tagline}>Transformando a apicultura através da tecnologia</Text>
+        <Image 
+          source={require('../../assets/splash-screen/mitescan_logo.png')} 
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
       </Animated.View>
-      
-      {/* Indicador de carregamento elegante */}
+
+      {/* Indicador de carregamento */}
       <Animated.View 
         style={[
           styles.loadingContainer,
           {
             opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }]
           }
         ]}
       >
@@ -145,7 +128,23 @@ export default function LoadingScreen({ navigation }) {
             ]} 
           />
         </View>
-        <Text style={styles.loadingText}>Inicializando HIVE SCAN...</Text>
+        <Text style={styles.loadingText}>Inicializando MITE SCAN...</Text>
+      </Animated.View>
+
+      {/* Imagem inferior - canto direito */}
+      <Animated.View 
+        style={[
+          styles.bottomImageContainer,
+          {
+            transform: [{ translateY: slideBottomAnim }]
+          }
+        ]}
+      >
+        <Image 
+          source={require('../../assets/splash-screen/bottom.png')} 
+          style={styles.bottomImage}
+          resizeMode="contain"
+        />
       </Animated.View>
 
       {/* Versão do app */}
@@ -154,97 +153,101 @@ export default function LoadingScreen({ navigation }) {
           styles.versionText,
           {
             opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }]
           }
         ]}
       >
         v1.0.0
       </Animated.Text>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
-  honeycombBackground: {
+  topImageContainer: {
     position: 'absolute',
-    width: width,
-    height: height,
+    top: -40,
+    left: 0,
+    width: width * 0.4,
+    height: height * 0.3,
   },
-  honeycombCell: {
-    position: 'absolute',
-    width: 50,
-    height: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 25,
-    transform: [{ rotate: '45deg' }],
+  topImage: {
+    width: '100%',
+    height: '100%',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 120,
+    justifyContent: 'center',
+    flex: 1,
+    paddingHorizontal: 40,
+    marginTop: 60,
   },
-  logoText: {
-    fontSize: 52,
-    fontWeight: 'bold',
-    color: '#333',
-    textShadowColor: 'rgba(255, 255, 255, 0.9)',
-    textShadowOffset: { width: 3, height: 3 },
-    textShadowRadius: 6,
-    letterSpacing: 2,
-  },
-  logoSubtext: {
-    fontSize: 72,
-    marginTop: 15,
-    marginBottom: 20,
+  logoImage: {
+    width: width * 0.5,
+    height: height * 0.12,
+    marginBottom: 30,
   },
   tagline: {
     fontSize: 16,
     color: '#333',
     textAlign: 'center',
-    fontWeight: '500',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    fontWeight: '600',
     maxWidth: 280,
     lineHeight: 22,
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   loadingContainer: {
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 80,
   },
   loadingBar: {
-    width: 200,
-    height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 2,
+    width: 250,
+    height: 6,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    borderRadius: 3,
     marginBottom: 20,
     overflow: 'hidden',
   },
   loadingProgress: {
     height: '100%',
-    backgroundColor: '#333',
-    borderRadius: 2,
+    backgroundColor: '#FFD700',
+    borderRadius: 3,
   },
   loadingText: {
     fontSize: 16,
     color: '#333',
     fontWeight: '600',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
+  bottomImageContainer: {
+    position: 'absolute',
+    bottom: -40,
+    right: 0,
+    width: width * 0.4,
+    height: height * 0.3,
+  },
+  bottomImage: {
+    width: '100%',
+    height: '100%',
+  },
   versionText: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 20,
     fontSize: 14,
     color: '#333',
     fontWeight: '500',
-    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
+    zIndex: 10,
   },
 });

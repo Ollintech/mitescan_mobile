@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Animated, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Image, Animated, TouchableOpacity, Dimensions, Easing } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 
@@ -310,26 +310,223 @@ export default function App() {
         initialRouteName="Loading"
         screenOptions={{
           headerShown: false,
+          ...TransitionPresets.SlideFromRightIOS,
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          transitionSpec: {
+            open: {
+              animation: 'timing',
+              config: {
+                duration: 400,
+                easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
+              },
+            },
+            close: {
+              animation: 'timing',
+              config: {
+                duration: 350,
+                easing: Easing.bezier(0.55, 0.055, 0.675, 0.19),
+              },
+            },
+          },
+          cardStyleInterpolator: ({ current, layouts }) => {
+            return {
+              cardStyle: {
+                transform: [
+                  {
+                    translateX: current.progress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [layouts.screen.width, 0],
+                    }),
+                  },
+                  {
+                    scale: current.progress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.95, 1],
+                    }),
+                  },
+                ],
+                opacity: current.progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.8, 1],
+                }),
+              },
+              overlayStyle: {
+                opacity: current.progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0, 0.5],
+                }),
+              },
+            };
+          },
         }}
       >
-        {/* Telas de Autenticação */}
-        <Stack.Screen name="Loading" component={LoadingScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
+        {/* Telas de Autenticação com transições especiais */}
+        <Stack.Screen 
+          name="Loading" 
+          component={LoadingScreen}
+          options={{
+            ...TransitionPresets.FadeIn,
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 600, easing: Easing.out(Easing.cubic) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 400, easing: Easing.in(Easing.cubic) },
+              },
+            },
+          }}
+        />
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen}
+          options={{
+            ...TransitionPresets.SlideFromBottomIOS,
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 500, easing: Easing.bezier(0.25, 0.46, 0.45, 0.94) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 400, easing: Easing.bezier(0.55, 0.055, 0.675, 0.19) },
+              },
+            },
+          }}
+        />
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen}
+          options={{
+            ...TransitionPresets.SlideFromBottomIOS,
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 500, easing: Easing.bezier(0.25, 0.46, 0.45, 0.94) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 400, easing: Easing.bezier(0.55, 0.055, 0.675, 0.19) },
+              },
+            },
+          }}
+        />
         
-        {/* Navegação Principal com Tabs */}
-        <Stack.Screen name="MainTabs" component={MainTabs} />
+        {/* Navegação Principal com Tabs - transição suave */}
+        <Stack.Screen 
+          name="MainTabs" 
+          component={MainTabs}
+          options={{
+            ...TransitionPresets.FadeIn,
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 800, easing: Easing.out(Easing.cubic) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 600, easing: Easing.in(Easing.cubic) },
+              },
+            },
+          }}
+        />
         
-        {/* Telas de Gestão de Colmeias */}
-        <Stack.Screen name="BeehiveRegister" component={BeehiveRegisterScreen} />
-        <Stack.Screen name="BeehiveEdit" component={BeehiveEditScreen} />
+        {/* Telas de Gestão de Colmeias - transição deslizante */}
+        <Stack.Screen 
+          name="BeehiveRegister" 
+          component={BeehiveRegisterScreen}
+          options={{
+            ...TransitionPresets.SlideFromRightIOS,
+            gestureDirection: 'horizontal',
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 450, easing: Easing.bezier(0.25, 0.46, 0.45, 0.94) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 400, easing: Easing.bezier(0.55, 0.055, 0.675, 0.19) },
+              },
+            },
+          }}
+        />
+        <Stack.Screen 
+          name="BeehiveEdit" 
+          component={BeehiveEditScreen}
+          options={{
+            ...TransitionPresets.SlideFromRightIOS,
+            gestureDirection: 'horizontal',
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 450, easing: Easing.bezier(0.25, 0.46, 0.45, 0.94) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 400, easing: Easing.bezier(0.55, 0.055, 0.675, 0.19) },
+              },
+            },
+          }}
+        />
         
-        {/* Telas de Funcionalidades */}
-        <Stack.Screen name="Camera" component={CameraScreen} />
-        <Stack.Screen name="History" component={HistoryScreen} />
+        {/* Telas de Funcionalidades - transições especiais */}
+        <Stack.Screen 
+          name="Camera" 
+          component={CameraScreen}
+          options={{
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 600, easing: Easing.bezier(0.25, 0.46, 0.45, 0.94) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 500, easing: Easing.bezier(0.55, 0.055, 0.675, 0.19) },
+              },
+            },
+          }}
+        />
+        <Stack.Screen 
+          name="History" 
+          component={HistoryScreen}
+          options={{
+            ...TransitionPresets.SlideFromRightIOS,
+            gestureDirection: 'horizontal',
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 450, easing: Easing.bezier(0.25, 0.46, 0.45, 0.94) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 400, easing: Easing.bezier(0.55, 0.055, 0.675, 0.19) },
+              },
+            },
+          }}
+        />
         
-        {/* Telas de Gestão de Usuários */}
-        <Stack.Screen name="UserEdit" component={UserEditScreen} />
+        {/* Telas de Gestão de Usuários - transições suaves */}
+        <Stack.Screen 
+          name="UserEdit" 
+          component={UserEditScreen}
+          options={{
+            ...TransitionPresets.SlideFromRightIOS,
+            gestureDirection: 'horizontal',
+            transitionSpec: {
+              open: {
+                animation: 'timing',
+                config: { duration: 450, easing: Easing.bezier(0.25, 0.46, 0.45, 0.94) },
+              },
+              close: {
+                animation: 'timing',
+                config: { duration: 400, easing: Easing.bezier(0.55, 0.055, 0.675, 0.19) },
+              },
+            },
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
