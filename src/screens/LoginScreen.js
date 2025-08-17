@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions, Image } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -17,26 +16,30 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Fundo amarelo com padrão de abelhas */}
-      <View style={styles.beePattern}>
-        {[...Array(20)].map((_, index) => (
-          <View key={index} style={[styles.beeOutline, {
-            left: (index % 5) * 80 + (index % 2) * 40,
-            top: Math.floor(index / 5) * 70
-          }]}>
-            <Text style={styles.beeIcon}>🐝</Text>
-          </View>
-        ))}
-      </View>
+      {/* Imagem de fundo */}
+      <Image 
+        source={require('../../assets/background-register.png')} 
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
+      
+      {/* Overlay amarelo sólido */}
+      <View style={styles.overlay} />
+      
+      
 
       {/* Card branco centralizado */}
       <View style={styles.loginCard}>
-        {/* Ícone circular preto com abelha branca */}
-        <View style={styles.iconContainer}>
-          <View style={styles.blackCircle}>
-            <Text style={styles.whiteBee}>🐝</Text>
-          </View>
-        </View>
+                 {/* Ícone circular preto com abelha */}
+         <View style={styles.iconContainer}>
+           <View style={styles.blackCircle}>
+             <Image 
+               source={require('../../assets/icon-bee.png')} 
+               style={styles.beeIcon}
+               resizeMode="contain"
+             />
+           </View>
+         </View>
 
         {/* Título Login */}
         <Text style={styles.loginTitle}>Login</Text>
@@ -66,17 +69,12 @@ export default function LoginScreen({ navigation }) {
           />
         </View>
 
-        {/* Botão ENTRAR com gradiente */}
-        <TouchableOpacity style={styles.enterButton} onPress={handleLogin}>
-          <LinearGradient
-            colors={['#FFD700', '#FFA500']}
-            style={styles.gradientButton}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
-            <Text style={styles.enterButtonText}>ENTRAR</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+                 {/* Botão ENTRAR */}
+         <TouchableOpacity style={styles.enterButton} onPress={handleLogin}>
+           <View style={styles.gradientButton}>
+             <Text style={styles.enterButtonText}>ENTRAR</Text>
+           </View>
+         </TouchableOpacity>
 
         {/* Texto de cadastro */}
         <View style={styles.registerContainer}>
@@ -92,34 +90,35 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFD700',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  beePattern: {
+  backgroundImage: {
     position: 'absolute',
-    width: width,
-    height: height,
+    width: '100%',
+    height: '100%',
   },
-  beeOutline: {
+  overlay: {
     position: 'absolute',
-    opacity: 0.3,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#FFC90B',
+    opacity: 0.6,
   },
-  beeIcon: {
-    fontSize: 24,
-    color: '#DAA520',
-  },
+
   loginCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 30,
+    borderRadius: 25,
+    padding: 35,
     width: width * 0.85,
     alignItems: 'center',
-    elevation: 8,
+    elevation: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   iconContainer: {
     marginTop: -30,
@@ -138,9 +137,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
-  whiteBee: {
-    fontSize: 32,
-    color: '#FFFFFF',
+  beeIcon: {
+    width: 32,
+    height: 32,
+    tintColor: '#FFFFFF',
   },
   loginTitle: {
     fontSize: 24,
@@ -182,10 +182,16 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   gradientButton: {
+    backgroundColor: '#FFC90B',
     borderRadius: 25,
-    paddingVertical: 15,
+    paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   enterButtonText: {
     color: '#000000',
@@ -201,7 +207,7 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   registerLink: {
-    color: '#FFD700',
+    color: '#FFC90B',
     fontWeight: 'bold',
   },
 });

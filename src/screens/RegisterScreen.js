@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, ScrollView, Image } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -33,26 +32,29 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <LinearGradient
-      colors={['#FFD700', '#FFA500']}
-      style={styles.container}
-    >
-      {/* Padrão de colmeia de fundo */}
-      <View style={styles.honeycombBackground}>
-        {[...Array(20)].map((_, index) => (
-          <View key={index} style={[styles.honeycombCell, { 
-            left: (index % 5) * 80 + (index % 2) * 40,
-            top: Math.floor(index / 5) * 70
-          }]} />
-        ))}
-      </View>
+    <View style={styles.container}>
+      {/* Imagem de fundo */}
+      <Image 
+        source={require('../../assets/background-register.png')} 
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
+      
+             {/* Overlay amarelo sólido */}
+       <View style={styles.overlay} />
+      
+      
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>HIVE SCAN</Text>
-          <Text style={styles.logoSubtext}>🐝</Text>
-        </View>
+                 {/* Logo */}
+         <View style={styles.logoContainer}>
+           <Text style={styles.logoText}>HIVE SCAN</Text>
+           <Image 
+             source={require('../../assets/icon-bee.png')} 
+             style={styles.logoBeeIcon}
+             resizeMode="contain"
+           />
+         </View>
         
         {/* Card de registro */}
         <View style={styles.registerCard}>
@@ -110,15 +112,27 @@ export default function RegisterScreen({ navigation }) {
           >
             <Text style={styles.loginButtonText}>Já tenho conta</Text>
           </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </LinearGradient>
-  );
+                 </View>
+       </ScrollView>
+     </View>
+   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#FFC90B',
+    opacity: 0.6,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -126,20 +140,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
   },
-  honeycombBackground: {
-    position: 'absolute',
-    width: width,
-    height: height,
-    opacity: 0.1,
-  },
-  honeycombCell: {
-    position: 'absolute',
-    width: 60,
-    height: 60,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 30,
-    transform: [{ rotate: '45deg' }],
-  },
+
   logoContainer: {
     alignItems: 'center',
     marginBottom: 30,
@@ -152,20 +153,24 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  logoSubtext: {
-    fontSize: 40,
+  logoBeeIcon: {
+    width: 40,
+    height: 40,
     marginTop: 5,
+    tintColor: '#333',
   },
   registerCard: {
     backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 30,
+    borderRadius: 25,
+    padding: 35,
     width: width * 0.85,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   headerContainer: {
     alignItems: 'center',
@@ -193,11 +198,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   registerButton: {
-    backgroundColor: '#FFD700',
-    borderRadius: 10,
-    padding: 15,
+    backgroundColor: '#FFC90B',
+    borderRadius: 15,
+    padding: 18,
     alignItems: 'center',
     marginBottom: 15,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   registerButtonText: {
     color: '#333',
@@ -207,13 +217,13 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#FFD700',
+    borderColor: '#FFC90B',
     borderRadius: 10,
     padding: 15,
     alignItems: 'center',
   },
   loginButtonText: {
-    color: '#FFD700',
+    color: '#FFC90B',
     fontSize: 16,
     fontWeight: 'bold',
   },

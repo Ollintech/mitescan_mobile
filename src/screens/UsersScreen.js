@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Alert } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -92,6 +93,32 @@ export default function UsersScreen({ navigation }) {
     Alert.alert('Adicionar Usuário', 'Funcionalidade em desenvolvimento');
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Sair',
+      'Tem certeza que deseja sair?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: () => {
+            // Reset da navegação para voltar ao login
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              })
+            );
+          },
+        },
+      ]
+    );
+  };
+
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -99,16 +126,24 @@ export default function UsersScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Usuários</Text>
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={handleAddUser}
-        >
-          <Text style={styles.addButtonText}>+</Text>
-        </TouchableOpacity>
-      </View>
+              {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Usuários</Text>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity 
+              style={styles.logoutButton}
+              onPress={handleLogout}
+            >
+              <Text style={styles.logoutButtonText}>🚪</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.addButton}
+              onPress={handleAddUser}
+            >
+              <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       
       {/* Barra de pesquisa */}
       <View style={styles.searchContainer}>
@@ -214,6 +249,27 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  logoutButton: {
+    backgroundColor: '#FF6B6B',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  logoutButtonText: {
+    fontSize: 18,
+    color: '#FFFFFF',
   },
   addButton: {
     backgroundColor: '#FFD700',
