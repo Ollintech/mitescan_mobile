@@ -265,16 +265,16 @@ const styles = {
   tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 2,
   },
   iconContainer: {
     position: 'relative',
-    marginBottom: 6,
+    marginBottom: 3,
   },
   tabIcon: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     resizeMode: 'contain',
   },
   iconGlow: {
@@ -288,9 +288,9 @@ const styles = {
     zIndex: -1,
   },
   tabLabel: {
-    fontSize: 11,
+    fontSize: 10,
     textAlign: 'center',
-    marginTop: 2,
+    marginTop: 1,
   },
   activeIndicator: {
     position: 'absolute',

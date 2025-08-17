@@ -19,6 +19,22 @@ export default function HomeScreen({ navigation }) {
       humidity: '45%',
       status: 'warning',
       image: 'https://via.placeholder.com/80x80/FFD700/000000?text=🐝'
+    },
+    {
+      id: 3,
+      name: 'COLMEIA 3',
+      temperature: '22°C',
+      humidity: '38%',
+      status: 'healthy',
+      image: 'https://via.placeholder.com/80x80/FFD700/000000?text=🐝'
+    },
+    {
+      id: 4,
+      name: 'COLMEIA 4',
+      temperature: '27°C',
+      humidity: '48%',
+      status: 'critical',
+      image: 'https://via.placeholder.com/80x80/FFD700/000000?text=🐝'
     }
   ];
 
@@ -62,30 +78,35 @@ export default function HomeScreen({ navigation }) {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Cards Principais */}
-        <View style={styles.metricsContainer}>
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <Text style={styles.hexIcon}>⬡</Text>
+        {/* Seção de KPIs Agrupados */}
+        <View style={styles.kpiSection}>
+          <View style={styles.kpiGrid}>
+            {/* KPI Colmeias */}
+            <View style={styles.kpiCard}>
+              <View style={styles.kpiIconContainer}>
+                <Text style={styles.kpiIcon}>🐝</Text>
+              </View>
+              <Text style={styles.kpiValue}>5</Text>
+              <Text style={styles.kpiLabel}>COLMEIAS</Text>
             </View>
-            <Text style={styles.metricLabel}>COLMEIAS</Text>
-            <Text style={styles.metricValue}>5</Text>
-          </View>
 
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <Text style={styles.hexIcon}>⬡</Text>
+            {/* KPI Taxa de Varroa */}
+            <View style={styles.kpiCard}>
+              <View style={styles.kpiIconContainer}>
+                <Text style={styles.kpiIcon}>📊</Text>
+              </View>
+              <Text style={styles.kpiValue}>40%</Text>
+              <Text style={styles.kpiLabel}>TAXA DE VARROA</Text>
             </View>
-            <Text style={styles.metricLabel}>TAXA DE VARROA</Text>
-            <Text style={styles.metricValue}>40%</Text>
-          </View>
 
-          <View style={styles.metricCard}>
-            <View style={styles.metricHeader}>
-              <Text style={styles.hexIcon}>⬡</Text>
+            {/* KPI Colmeias + Varroa */}
+            <View style={styles.kpiCard}>
+              <View style={styles.kpiIconContainer}>
+                <Text style={styles.kpiIcon}>⚠️</Text>
+              </View>
+              <Text style={styles.kpiValue}>2</Text>
+              <Text style={styles.kpiLabel}>COLMEIAS + VARROA</Text>
             </View>
-            <Text style={styles.metricLabel}>COLMEIAS + VARROA</Text>
-            <Text style={styles.metricValue}>2</Text>
           </View>
         </View>
 
@@ -150,38 +171,51 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  metricsContainer: {
+  kpiSection: {
     marginBottom: 30,
   },
-  metricCard: {
+  kpiGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  kpiCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    padding: 15,
+    flex: 1,
+    alignItems: 'center',
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
+    minHeight: 120,
   },
-  metricHeader: {
-    marginBottom: 10,
+  kpiIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#FFD700',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  hexIcon: {
-    fontSize: 20,
-    color: '#FFD700',
+  kpiIcon: {
+    fontSize: 24,
   },
-  metricLabel: {
-    fontSize: 14,
-    color: '#000',
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-  metricValue: {
-    fontSize: 32,
+  kpiValue: {
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#000',
+    marginBottom: 4,
     textAlign: 'center',
+  },
+  kpiLabel: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    fontWeight: '500',
   },
   realtimeSection: {
     marginBottom: 30,
