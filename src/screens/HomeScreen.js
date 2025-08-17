@@ -80,6 +80,10 @@ export default function HomeScreen({ navigation }) {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Seção de KPIs Agrupados */}
         <View style={styles.kpiSection}>
+          <View style={styles.kpiHeader}>
+            <Text style={styles.kpiTitle}>INDICADORES PRINCIPAIS</Text>
+          </View>
+          
           <View style={styles.kpiGrid}>
             {/* KPI Colmeias */}
             <View style={styles.kpiCard}>
@@ -118,7 +122,7 @@ export default function HomeScreen({ navigation }) {
           
           {beehives.map((beehive) => (
             <View key={beehive.id} style={styles.beehiveCard}>
-              <Image source={{ uri: beehive.image }} style={styles.beehiveImage} />
+              <Image source={require('../../assets/hive-example.png')} style={styles.beehiveImage} />
               <View style={styles.beehiveInfo}>
                 <View style={styles.beehiveRow}>
                   <Text style={styles.beehiveName}>⬤ {beehive.name}</Text>
@@ -150,8 +154,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 30,
-    paddingBottom: 15,
+    paddingTop: 20,
+    paddingBottom: 10,
     elevation: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -164,8 +168,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   headerIcon: {
-    width: 80,
-    height: 80,
+    width: 75,
+    height: 75,
   },
   content: {
     flex: 1,
@@ -173,6 +177,23 @@ const styles = StyleSheet.create({
   },
   kpiSection: {
     marginBottom: 30,
+  },
+  kpiHeader: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+  },
+  kpiTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
   },
   kpiGrid: {
     flexDirection: 'row',
@@ -246,10 +267,11 @@ const styles = StyleSheet.create({
     shadowRadius: 2.22,
   },
   beehiveImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    marginRight: 15,
+    width: 60,
+    height: 60,
+    borderRadius: 6,
+    marginRight: 12,
+    resizeMode: 'cover',
   },
   beehiveInfo: {
     flex: 1,

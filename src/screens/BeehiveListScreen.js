@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Alert, Image } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -106,6 +106,17 @@ export default function BeehiveListScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* Header Amarelo com Logo */}
+      <View style={styles.logoHeader}>
+        <View style={styles.logoHeaderContent}>
+          <Image 
+            source={require('../../assets/ms-icon.png')} 
+            style={styles.logoHeaderIcon}
+            resizeMode="contain"
+          />
+        </View>
+      </View>
+      
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Minhas Colmeias</Text>
@@ -194,6 +205,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  logoHeader: {
+    backgroundColor: '#FFD700',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 5,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  logoHeaderContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoHeaderIcon: {
+    width: 95,
+    height: 95,
   },
   header: {
     backgroundColor: '#fff',
