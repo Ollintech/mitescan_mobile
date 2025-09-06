@@ -1,8 +1,8 @@
-# 🐝 HIVE SCAN - Aplicativo Mobile de Apicultura
+# 🐝 MITE SCAN - Aplicativo Mobile de Apicultura
 
 ## 📱 Sobre o Projeto
 
-O **HIVE SCAN** é um aplicativo mobile desenvolvido em React Native com Expo, focado no monitoramento e análise de colmeias para apicultores. O app permite gerenciar colmeias, realizar análises de saúde, acompanhar histórico de análises e gerenciar usuários do sistema.
+O **MKTE SCAN** é um aplicativo mobile desenvolvido em React Native com Expo, focado no monitoramento e análise de colmeias para apicultores. O app permite gerenciar colmeias, realizar análises de saúde, acompanhar histórico de análises e gerenciar usuários do sistema.
 
 ## ✨ Funcionalidades Principais
 
@@ -185,49 +185,6 @@ npx expo start
 - **Armazenamento**: Para salvar fotos
 - **Internet**: Para sincronização de dados
 
-## 📈 Próximos Passos
-
-1. **Backend Integration**
-   - API REST para dados das colmeias
-   - Autenticação real com JWT
-   - Banco de dados para persistência
-
-2. **Funcionalidades Avançadas**
-   - Análise por IA das fotos
-   - Relatórios em PDF
-   - Exportação de dados
-   - Sincronização em tempo real
-
-3. **Melhorias de UX**
-   - Animações mais fluidas
-   - Temas personalizáveis
-   - Modo escuro
-   - Acessibilidade
-
-## 🤝 Contribuição
-
-Para contribuir com o projeto:
-
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
-
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## 👨‍💻 Desenvolvedor
-
-**Gustavo Marques** - Desenvolvedor Full Stack
-
-## 📞 Suporte
-
-Para dúvidas ou suporte:
-- Email: [seu-email@exemplo.com]
-- GitHub: [@seu-usuario]
-
----
-
-**HIVE SCAN** - Transformando a apicultura através da tecnologia! 🐝✨
