@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     height: 95,
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFD700',
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   addButton: {
-    backgroundColor: '#FFD700',
+    backgroundColor: '#fff',
     width: 40,
     height: 40,
     borderRadius: 20,

@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFD700',
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   logoutButton: {
-    backgroundColor: '#FF6B6B',
+    backgroundColor: '#FF6B3b',
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   addButton: {
-    backgroundColor: '#FFD700',
+    backgroundColor: '#fff',
     width: 40,
     height: 40,
     borderRadius: 20,
