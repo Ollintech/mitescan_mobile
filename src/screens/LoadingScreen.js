@@ -128,7 +128,6 @@ export default function LoadingScreen({ navigation }) {
             ]} 
           />
         </View>
-        <Text style={styles.loadingText}>Inicializando MITE SCAN...</Text>
       </Animated.View>
 
       {/* Imagem inferior - canto direito */}
@@ -156,7 +155,7 @@ export default function LoadingScreen({ navigation }) {
           }
         ]}
       >
-        v1.0.0
+        v1.0
       </Animated.Text>
     </View>
   );

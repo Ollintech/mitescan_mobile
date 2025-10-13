@@ -107,15 +107,7 @@ export default function BeehiveListScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Header Amarelo com Logo */}
-      <View style={styles.logoHeader}>
-        <View style={styles.logoHeaderContent}>
-          <Image 
-            source={require('../../assets/ms-icon.png')} 
-            style={styles.logoHeaderIcon}
-            resizeMode="contain"
-          />
-        </View>
-      </View>
+      
       
       {/* Header */}
       <View style={styles.header}>
