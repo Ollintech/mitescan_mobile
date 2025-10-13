@@ -4,14 +4,26 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions, Image 
 const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen({ navigation }) {
-  const [login, setLogin] = useState('');
+  const [email, setEmail] = useState('');
+  const [conta, setConta] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    // Simulação de login
-    if (login && password) {
-      navigation.replace('MainTabs');
+    // Simulação de login - A sua lógica atual tem um erro: 'login' não está definido.
+    // Presumindo que você queira usar 'email' e 'password' (ou 'conta' e 'password')
+    // Corrigi para usar 'email' (que é um campo de login) e 'password'.
+    if (email && password) {
+      // navigation.replace é usado para substituir a tela atual na pilha
+      navigation.replace('MainTabs'); 
+    } else {
+      // Opcional: Adicionar feedback ao usuário se os campos estiverem vazios
+      console.log('Preencha email e senha para logar.');
     }
+  };
+
+  const handleRegisterPress = () => {
+    // Redireciona para a tela de cadastro
+    navigation.navigate('Register'); 
   };
 
   return (
@@ -26,32 +38,42 @@ export default function LoginScreen({ navigation }) {
       {/* Overlay amarelo sólido */}
       <View style={styles.overlay} />
       
-      
-
       {/* Card branco centralizado */}
       <View style={styles.loginCard}>
-                 {/* Ícone circular preto com abelha */}
-         <View style={styles.iconContainer}>
-           <View style={styles.blackCircle}>
-             <Image 
-               source={require('../../assets/icon-bee.png')} 
-               style={styles.beeIcon}
-               resizeMode="contain"
-             />
-           </View>
-         </View>
+        {/* Ícone circular preto com abelha */}
+        <View style={styles.iconContainer}>
+          <View style={styles.blackCircle}>
+            <Image 
+              source={require('../../assets/icon-bee.png')} 
+              style={styles.beeIcon}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
 
         {/* Título Login */}
         <Text style={styles.loginTitle}>Login</Text>
 
-        {/* Campo Login */}
+        {/* Campo Conta */}
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Login:</Text>
+          <Text style={styles.inputLabel}>Conta:</Text>
           <TextInput
             style={styles.textInput}
-            value={login}
-            onChangeText={setLogin}
-            placeholder="Digite seu login"
+            value={conta}
+            onChangeText={setConta}
+            placeholder="Digite sua conta root"
+            placeholderTextColor="#999"
+          />
+        </View>
+
+        {/* Campo Login */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.inputLabel}>Email:</Text>
+          <TextInput
+            style={styles.textInput}
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Digite seu email"
             placeholderTextColor="#999"
           />
         </View>
@@ -69,17 +91,21 @@ export default function LoginScreen({ navigation }) {
           />
         </View>
 
-                 {/* Botão ENTRAR */}
-         <TouchableOpacity style={styles.enterButton} onPress={handleLogin}>
-           <View style={styles.gradientButton}>
-             <Text style={styles.enterButtonText}>ENTRAR</Text>
-           </View>
-         </TouchableOpacity>
+        {/* Botão ENTRAR */}
+        <TouchableOpacity style={styles.enterButton} onPress={handleLogin}>
+          <View style={styles.gradientButton}>
+            <Text style={styles.enterButtonText}>ENTRAR</Text>
+          </View>
+        </TouchableOpacity>
 
         {/* Texto de cadastro */}
         <View style={styles.registerContainer}>
           <Text style={styles.registerText}>
-            Não possui conta? <Text style={styles.registerLink}>Cadastre-se!</Text>
+            Não possui conta? 
+            {/* TouchableOpacity para o link de cadastro */}
+            <TouchableOpacity onPress={handleRegisterPress} activeOpacity={0.7}>
+              <Text style={styles.registerLink}>Cadastre-se!</Text>
+            </TouchableOpacity>
           </Text>
         </View>
       </View>
@@ -201,13 +227,22 @@ const styles = StyleSheet.create({
   },
   registerContainer: {
     alignItems: 'center',
+    // Adicionado flexDirection: 'row' para que o link fique inline com o texto
+    flexDirection: 'row', 
+    justifyContent: 'center',
   },
   registerText: {
     fontSize: 16,
     color: '#666666',
+    // Opcional: Adicionado para garantir que o texto "Não possui conta?" e o TouchableOpacity estejam na mesma linha
+    lineHeight: 20, 
   },
   registerLink: {
     color: '#FFC90B',
     fontWeight: 'bold',
+    // Adicionado para que o link tenha um espaçamento adequado
+    marginLeft: 5, 
+    fontSize: 16, // Garantir o mesmo tamanho de fonte
+    lineHeight: 20, // Garantir a mesma altura de linha
   },
 });
