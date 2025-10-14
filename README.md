@@ -2,54 +2,7 @@
 
 ## 📱 Sobre o Projeto
 
-O **MKTE SCAN** é um aplicativo mobile desenvolvido em React Native com Expo, focado no monitoramento e análise de colmeias para apicultores. O app permite gerenciar colmeias, realizar análises de saúde, acompanhar histórico de análises e gerenciar usuários do sistema.
-
-## ✨ Funcionalidades Principais
-
-### 🔐 Autenticação
-- **Tela de Loading** com animação e logo
-- **Login** com email e senha
-- **Cadastro** de novos usuários
-- **Recuperação de senha**
-
-### 🏠 Gestão de Colmeias
-- **Dashboard** com visão geral das colmeias
-- **Lista de Colmeias** com busca e filtros
-- **Cadastro de Nova Colmeia** com foto e localização
-- **Edição de Colmeias** existentes
-- **Exclusão** de colmeias
-- **Status** das colmeias (Saudável, Atenção, Crítica)
-
-### 🗺️ Mapa e Localização
-- **Mapa interativo** das colmeias
-- **Marcadores** coloridos por status
-- **GPS** para localização atual
-- **Legenda** dos status
-
-### 🔬 Análise de Colmeias
-- **Análise rápida** por GPS
-- **Análise detalhada** por colmeia selecionada
-- **Processo de análise** com loading
-- **Resultados** com confiança
-
-### 📸 Câmera
-- **Captura de fotos** das colmeias
-- **Controles de câmera** (flash, zoom)
-- **Grid de foco** para melhor enquadramento
-- **Preview** da foto capturada
-
-### 📊 Histórico e Relatórios
-- **Histórico completo** de análises
-- **Filtros** por resultado
-- **Estatísticas** de análises
-- **Detalhes** de cada análise
-
-### 👥 Gestão de Usuários
-- **Lista de usuários** com busca
-- **Perfis** (Admin, Gerente, Usuário)
-- **Status** (Ativo/Inativo)
-- **Edição** de informações
-- **Exclusão** de usuários
+O **MITE SCAN** é um aplicativo mobile desenvolvido em React Native com Expo, focado no monitoramento e análise de colmeias para apicultores. O app permite gerenciar colmeias, realizar análises de saúde, acompanhar histórico de análises e gerenciar usuários do sistema.
 
 ## 🛠️ Tecnologias Utilizadas
 
