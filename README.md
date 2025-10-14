@@ -1,4 +1,4 @@
-# 🐝 MITE SCAN - Aplicativo Mobile de Apicultura
+# 🐝 MITE SCAN
 
 ## 📱 Sobre o Projeto
 
@@ -59,8 +59,7 @@ O **MKTE SCAN** é um aplicativo mobile desenvolvido em React Native com Expo, f
 - **Expo Linear Gradient** - Gradientes e efeitos visuais
 - **Expo Camera** - Funcionalidades de câmera
 - **Expo Location** - Serviços de localização
-- **Expo Image Picker** - Seleção de imagens
-
+- **Expo Image Picker** - Seleção de imagen
 ## 📱 Estrutura do Projeto
 
 ```
@@ -72,8 +71,7 @@ mitescan_mobile/
 │   │   ├── LoginScreen.js
 │   │   ├── RegisterScreen.js
 │   │   ├── HomeScreen.js
-│   │   ├── BeehiveListScreen.js
-│   │   ├── BeehiveEditScreen.js
+│   │   ├── BeehiveListScreen.js │   ├── BeehiveEditScreen.js
 │   │   ├── BeehiveRegisterScreen.js
 │   │   ├── MapScreen.js
 │   │   ├── CameraScreen.js
@@ -119,72 +117,7 @@ npx expo start
 - Instale o app **Expo Go** na Play Store/App Store
 - Escaneie o QR Code que aparece no terminal
 - O app será carregado automaticamente
-
-## 🎨 Design e Interface
-
-### Paleta de Cores
-- **Primária**: #FFD700 (Dourado)
-- **Secundária**: #4CAF50 (Verde)
-- **Atenção**: #FF9800 (Laranja)
-- **Crítica**: #F44336 (Vermelho)
-- **Neutro**: #333, #666, #999
-
-### Características Visuais
-- **Tema**: Apicultura com elementos de colmeia
-- **Padrões**: Fundo com padrão de colmeia hexagonal
-- **Ícones**: Emojis para melhor usabilidade
-- **Cards**: Design moderno com sombras e bordas arredondadas
-
-## 📋 Funcionalidades Implementadas
-
-### ✅ Completas
-- [x] Navegação entre telas
-- [x] Sistema de autenticação (mock)
-- [x] Dashboard principal
-- [x] Lista de colmeias
-- [x] Cadastro de colmeias
-- [x] Edição de colmeias
-- [x] Mapa interativo
-- [x] Sistema de análise
-- [x] Histórico de análises
-- [x] Gestão de usuários
-- [x] Interface de câmera
-- [x] Sistema de status e filtros
-
-### 🔄 Em Desenvolvimento
-- [ ] Integração com backend real
-- [ ] Autenticação real com JWT
-- [ ] Funcionalidade de câmera real
-- [ ] GPS e localização real
-- [ ] Upload de imagens
-- [ ] Notificações push
-- [ ] Sincronização offline
-
-## 🧪 Testes
-
-### Funcionalidades Testadas
-- Navegação entre todas as telas
-- Formulários de cadastro e edição
-- Filtros e busca
-- Estados de loading
-- Alertas e confirmações
-- Responsividade em diferentes tamanhos de tela
-
-## 📱 Compatibilidade
-
-- **Android**: 6.0 (API 23) ou superior
-- **iOS**: 12.0 ou superior
-- **Expo**: SDK 50
-- **React Native**: 0.73.2
-
-## 🔧 Configurações
-
-### Permissões Necessárias
-- **Câmera**: Para captura de fotos das colmeias
-- **Localização**: Para GPS e mapa
-- **Armazenamento**: Para salvar fotos
-- **Internet**: Para sincronização de dados
-
+- 
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
