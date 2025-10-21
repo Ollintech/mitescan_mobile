@@ -41,16 +41,17 @@ export default function HomeScreen({ navigation }) {
   const getStatusIcon = (status) => {
     switch (status) {
       case 'healthy':
-        return '✅';
+        return require('../../assets/ok-icon.png');
       case 'warning':
-        return '⚠️';
       case 'critical':
-        return '🚨';
+        return require('../../assets/atention-icon.png'); 
       default:
-        return '❓';
+        return null;
     }
   };
 
+  // A FUNÇÃO getStatusColor NÃO É MAIS USADA DIRETAMENTE PARA O BACKGROUND DO INDICADOR
+  // Mas pode ser útil para outras partes, então a mantenho.
   const getStatusColor = (status) => {
     switch (status) {
       case 'healthy':
@@ -132,8 +133,13 @@ export default function HomeScreen({ navigation }) {
                   <Text style={styles.beehiveMetric}>💧 {beehive.humidity}</Text>
                 </View>
               </View>
-              <View style={[styles.statusIndicator, { backgroundColor: getStatusColor(beehive.status) }]}>
-                <Text style={styles.statusIcon}>{getStatusIcon(beehive.status)}</Text>
+              {/* REMOVIDA A PROPRIEDADE 'backgroundColor' DO ESTILO INLINE */}
+              <View style={styles.statusIndicator}> 
+                <Image 
+                  source={getStatusIcon(beehive.status)} 
+                  style={styles.statusImage} 
+                  resizeMode="contain" 
+                />
               </View>
             </View>
           ))}
@@ -217,7 +223,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FFD700',
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
@@ -242,10 +248,15 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   realtimeHeader: {
-    backgroundColor: '#FFD700',
+    backgroundColor: '#FFFFFF',
     borderRadius: 15,
     padding: 15,
     marginBottom: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   realtimeTitle: {
     fontSize: 16,
@@ -292,14 +303,20 @@ const styles = StyleSheet.create({
     color: '#666',
     marginRight: 20,
   },
+  // ESTILO statusIndicator MODIFICADO: SEM backgroundColor
   statusIndicator: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 25, // Mantém a forma circular, mas sem fundo
     justifyContent: 'center',
     alignItems: 'center',
+    // backgroundColor: 'transparent', // Pode adicionar isso explicitamente se houver algum padrão
   },
-  statusIcon: {
+  statusImage: {
+    width: 30, 
+    height: 30, 
+  },
+  statusIcon: { 
     fontSize: 24,
   },
 });
