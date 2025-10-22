@@ -92,6 +92,7 @@ export default function BeehiveListScreen({ navigation }) {
           text: 'Excluir', 
           style: 'destructive',
           onPress: () => {
+            // Lógica de exclusão da colmeia
             Alert.alert('Sucesso', 'Colmeia excluída com sucesso!');
           }
         }
@@ -106,9 +107,6 @@ export default function BeehiveListScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Header Amarelo com Logo */}
-      
-      
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Minhas Colmeias</Text>
@@ -116,7 +114,12 @@ export default function BeehiveListScreen({ navigation }) {
           style={styles.addButton}
           onPress={() => navigation.navigate('BeehiveRegister')}
         >
-          <Text style={styles.addButtonText}>+</Text>
+          {/* ÍCONE DE ADICIONAR: create-icon.png */}
+          <Image
+            source={require('../../assets/create-icon.png')} 
+            style={styles.addButtonIcon}
+            resizeMode="contain"
+          />
         </TouchableOpacity>
       </View>
       
@@ -162,17 +165,29 @@ export default function BeehiveListScreen({ navigation }) {
                 Última análise: {beehive.lastAnalysis}
               </Text>
               <View style={styles.actionButtons}>
+                {/* BOTÃO DE EDITAR: edit-icon.png */}
                 <TouchableOpacity 
                   style={styles.editButton}
                   onPress={() => handleEditBeehive(beehive)}
                 >
-                  <Text style={styles.editButtonText}>✏️ Editar</Text>
+                  <Image
+                    source={require('../../assets/edit-icon.png')}
+                    style={[styles.actionButtonIcon, { tintColor: '#333' }]}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.editButtonText}>Editar</Text>
                 </TouchableOpacity>
+                {/* BOTÃO DE EXCLUIR: delete-icon.png */}
                 <TouchableOpacity 
                   style={styles.deleteButton}
                   onPress={() => handleDeleteBeehive(beehive)}
                 >
-                  <Text style={styles.deleteButtonText}>🗑️ Excluir</Text>
+                  <Image
+                    source={require('../../assets/delete-icon.png')}
+                    style={[styles.actionButtonIcon, { tintColor: '#f44336' }]}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.deleteButtonText}>Excluir</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -193,6 +208,10 @@ export default function BeehiveListScreen({ navigation }) {
   );
 }
 
+// ----------------------------------------------------------------------
+// ESTILOS 
+// ----------------------------------------------------------------------
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -211,15 +230,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-  },
-  logoHeaderContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoHeaderIcon: {
-    width: 95,
-    height: 95,
   },
   header: {
     backgroundColor: '#FFD700',
@@ -245,10 +255,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  addButtonText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
+  // Estilo para o ícone de Adicionar (create-icon.png)
+  addButtonIcon: {
+    width: 24, 
+    height: 24,
   },
   searchContainer: {
     backgroundColor: '#fff',
@@ -338,6 +348,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  // Estilo para os ícones de ação (edit-icon.png e delete-icon.png)
+  actionButtonIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 5,
+    // A cor é definida inline no componente para 'Editar' e 'Excluir'
+  },
   editButton: {
     backgroundColor: '#FFD700',
     paddingHorizontal: 15,
@@ -346,6 +363,8 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 10,
     alignItems: 'center',
+    flexDirection: 'row', 
+    justifyContent: 'center',
   },
   editButtonText: {
     color: '#333',
@@ -359,6 +378,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex: 1,
     alignItems: 'center',
+    flexDirection: 'row', 
+    justifyContent: 'center',
   },
   deleteButtonText: {
     color: '#f44336',
