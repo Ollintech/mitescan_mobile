@@ -94,24 +94,10 @@ export default function AnalysisScreen({ navigation }) {
           style={styles.historyButton}
           onPress={() => navigation.navigate('History')}
         >
-          <Text style={styles.historyButtonText}>📊</Text>
         </TouchableOpacity>
       </View>
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Card de Análise Rápida */}
-        <View style={styles.quickAnalysisCard}>
-          <Text style={styles.cardTitle}>Análise Rápida</Text>
-          <Text style={styles.cardSubtitle}>
-            Analise rapidamente a colmeia mais próxima usando GPS
-          </Text>
-          <TouchableOpacity 
-            style={styles.quickAnalysisButton}
-            onPress={handleQuickAnalysis}
-          >
-            <Text style={styles.quickAnalysisButtonText}>🔍 Iniciar Análise Rápida</Text>
-          </TouchableOpacity>
-        </View>
         
         {/* Lista de Colmeias para Análise */}
         <View style={styles.beehivesCard}>
