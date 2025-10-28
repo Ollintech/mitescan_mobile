@@ -1,64 +1,101 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Alert, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Alert, Image, ActivityIndicator } from 'react-native';
+import { getAllHives, getStoredUser } from '../api/client';
 
 const { width } = Dimensions.get('window');
 
 export default function BeehiveListScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Dados mockados das colmeias
-  const [beehives] = useState([
-    {
-      id: 1,
-      name: 'Colmeia A1',
-      location: 'Fazenda São João',
-      status: 'healthy',
-      temperature: '35°C',
-      humidity: '65%',
-      lastAnalysis: '2024-01-15',
-      image: '🏠'
-    },
-    {
-      id: 2,
-      name: 'Colmeia B2',
-      location: 'Fazenda São João',
-      status: 'warning',
-      temperature: '38°C',
-      humidity: '70%',
-      lastAnalysis: '2024-01-14',
-      image: '🏠'
-    },
-    {
-      id: 3,
-      name: 'Colmeia C3',
-      location: 'Fazenda Santa Maria',
-      status: 'healthy',
-      temperature: '36°C',
-      humidity: '62%',
-      lastAnalysis: '2024-01-13',
-      image: '🏠'
-    },
-    {
-      id: 4,
-      name: 'Colmeia D4',
-      location: 'Fazenda Santa Maria',
-      status: 'critical',
-      temperature: '40°C',
-      humidity: '75%',
-      lastAnalysis: '2024-01-12',
-      image: '🏠'
-    },
-    {
-      id: 5,
-      name: 'Colmeia E5',
-      location: 'Fazenda São João',
-      status: 'healthy',
-      temperature: '34°C',
-      humidity: '60%',
-      lastAnalysis: '2024-01-11',
-      image: '🏠'
-    }
-  ]);
+  const [beehives, setBeehives] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // ----------------------------------------------------------------------
+  // MOCK ORIGINAL (mantido comentado para fallback rápido)
+  // Ative, se necessário, removendo os comentários abaixo e usando setBeehives(MOCK_BEEHIVES)
+  // const MOCK_BEEHIVES = [
+  //   {
+  //     id: 1,
+  //     name: 'Colmeia A1',
+  //     location: 'Fazenda São João',
+  //     status: 'healthy',
+  //     temperature: '35°C',
+  //     humidity: '65%',
+  //     lastAnalysis: '2024-01-15',
+  //     image: '🏠'
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Colmeia B2',
+  //     location: 'Fazenda São João',
+  //     status: 'warning',
+  //     temperature: '38°C',
+  //     humidity: '70%',
+  //     lastAnalysis: '2024-01-14',
+  //     image: '🏠'
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'Colmeia C3',
+  //     location: 'Fazenda Santa Maria',
+  //     status: 'healthy',
+  //     temperature: '36°C',
+  //     humidity: '62%',
+  //     lastAnalysis: '2024-01-13',
+  //     image: '🏠'
+  //   },
+  //   {
+  //     id: 4,
+  //     name: 'Colmeia D4',
+  //     location: 'Fazenda Santa Maria',
+  //     status: 'critical',
+  //     temperature: '40°C',
+  //     humidity: '75%',
+  //     lastAnalysis: '2024-01-12',
+  //     image: '🏠'
+  //   },
+  //   {
+  //     id: 5,
+  //     name: 'Colmeia E5',
+  //     location: 'Fazenda São João',
+  //     status: 'healthy',
+  //     temperature: '34°C',
+  //     humidity: '60%',
+  //     lastAnalysis: '2024-01-11',
+  //     image: '🏠'
+  //   }
+  // ];
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const user = await getStoredUser();
+        if (!user?.id) throw new Error('Usuário não identificado');
+        const data = await getAllHives(user.id);
+        // Map backend hives to UI shape quickly
+        const normalized = data.map(h => ({
+          id: h.id,
+          name: `Colmeia #${h.id}`,
+          location: `(${h.location_lat?.toFixed?.(3)}, ${h.location_lng?.toFixed?.(3)})`,
+          status: 'healthy',
+          temperature: h.temperature ? `${h.temperature}°C` : '--',
+          humidity: h.humidity ? `${h.humidity}%` : '--',
+          lastAnalysis: '—',
+          image: '🏠',
+        }));
+        if (mounted) setBeehives(normalized);
+      } catch (e) {
+        if (mounted) setError(e?.data?.detail || e?.message || 'Erro ao carregar colmeias');
+        // Fallback rápido (descomente para usar mock em caso de erro):
+        // if (mounted) setBeehives(MOCK_BEEHIVES);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -134,6 +171,17 @@ export default function BeehiveListScreen({ navigation }) {
         />
       </View>
       
+      {loading && (
+        <View style={{ padding: 20 }}>
+          <ActivityIndicator />
+        </View>
+      )}
+      {!!error && !loading && (
+        <View style={{ padding: 20 }}>
+          <Text style={{ color: '#f44336' }}>{String(error)}</Text>
+        </View>
+      )}
+
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {filteredBeehives.map((beehive) => (
           <View key={beehive.id} style={styles.beehiveCard}>
