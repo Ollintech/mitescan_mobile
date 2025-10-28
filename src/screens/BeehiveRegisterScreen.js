@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import { createHive, getStoredUser } from '../api/client';
 
 const { width } = Dimensions.get('window');
 
@@ -13,6 +14,7 @@ export default function BeehiveRegisterScreen({ navigation }) {
     installationDate: '',
     coordinates: null // Adicionando coordenadas
   });
+  const [submitting, setSubmitting] = useState(false);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -21,22 +23,44 @@ export default function BeehiveRegisterScreen({ navigation }) {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.name || !formData.location) {
       Alert.alert('Erro', 'Por favor, preencha pelo menos o nome e localização da colmeia');
       return;
     }
-    
-    Alert.alert(
-      'Sucesso', 
-      'Colmeia cadastrada com sucesso!', 
-      [
-        { 
-          text: 'OK', 
-          onPress: () => navigation.goBack() 
+    try {
+      setSubmitting(true);
+      const user = await getStoredUser();
+      if (!user?.id) throw new Error('Usuário não identificado');
+      // Mapear campos mínimos aceitos pelo backend
+      const bee_type_id = 1; // valor padrão; idealmente escolha em UI
+      const size = Number(formData.capacity || 0) || 0;
+      // Extrair coordenadas de 'location' se possível (formato "lat, lng")
+      let location_lat = undefined;
+      let location_lng = undefined;
+      if (formData.coordinates && typeof formData.coordinates.lat === 'number') {
+        location_lat = formData.coordinates.lat;
+        location_lng = formData.coordinates.lng;
+      } else {
+        const parts = String(formData.location).split(',').map(p => parseFloat(p));
+        if (parts.length === 2 && parts.every(n => !Number.isNaN(n))) {
+          location_lat = parts[0];
+          location_lng = parts[1];
         }
-      ]
-    );
+      }
+      if (typeof location_lat !== 'number' || typeof location_lng !== 'number') {
+        throw new Error('Informe coordenadas válidas (lat, lng)');
+      }
+      const humidity = undefined;
+      const temperature = undefined;
+      await createHive(user.id, { bee_type_id, location_lat, location_lng, size, humidity, temperature });
+      Alert.alert('Sucesso', 'Colmeia cadastrada com sucesso!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+    } catch (e) {
+      const msg = e?.data?.detail || e?.message || 'Falha ao cadastrar colmeia';
+      Alert.alert('Erro', String(msg));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleTakePhoto = () => {
@@ -177,8 +201,13 @@ export default function BeehiveRegisterScreen({ navigation }) {
           <TouchableOpacity 
             style={styles.saveButton}
             onPress={handleSubmit}
+            disabled={submitting}
           >
-            <Text style={styles.saveButtonText}>Salvar Colmeia</Text>
+            {submitting ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.saveButtonText}>Salvar Colmeia</Text>
+            )}
           </TouchableOpacity>
         </View>
       </ScrollView>

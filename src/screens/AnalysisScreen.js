@@ -1,20 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import { getStoredUser, getAllHives, createHiveAnalysis } from '../api/client';
 
 const { width } = Dimensions.get('window');
 
 export default function AnalysisScreen({ navigation }) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedBeehive, setSelectedBeehive] = useState(null);
-  
-  // Dados mockados das colmeias disponíveis para análise
-  const availableBeehives = [
-    { id: 1, name: 'Colmeia A1', status: 'healthy', lastAnalysis: '2024-01-15' },
-    { id: 2, name: 'Colmeia B2', status: 'warning', lastAnalysis: '2024-01-14' },
-    { id: 3, name: 'Colmeia C3', status: 'healthy', lastAnalysis: '2024-01-13' },
-    { id: 4, name: 'Colmeia D4', status: 'critical', lastAnalysis: '2024-01-12' },
-    { id: 5, name: 'Colmeia E5', status: 'healthy', lastAnalysis: '2024-01-11' },
-  ];
+  const [availableBeehives, setAvailableBeehives] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // MOCK opcional (comentado)
+  // const MOCK_AVAILABLE_BEEHIVES = [
+  //   { id: 1, name: 'Colmeia A1', status: 'healthy', lastAnalysis: '2024-01-15' },
+  //   { id: 2, name: 'Colmeia B2', status: 'warning', lastAnalysis: '2024-01-14' },
+  // ];
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const user = await getStoredUser();
+        if (!user?.id) throw new Error('Usuário não identificado');
+        const hives = await getAllHives(user.id);
+        const normalized = hives.map(h => ({ id: h.id, name: `Colmeia #${h.id}`, status: 'healthy', lastAnalysis: '—' }));
+        if (mounted) setAvailableBeehives(normalized);
+      } catch (e) {
+        if (mounted) setError(e?.data?.detail || e?.message || 'Erro ao carregar colmeias');
+        // if (mounted) setAvailableBeehives(MOCK_AVAILABLE_BEEHIVES);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -34,15 +54,23 @@ export default function AnalysisScreen({ navigation }) {
     }
   };
 
-  const handleStartAnalysis = (beehive) => {
-    setSelectedBeehive(beehive);
-    setIsAnalyzing(true);
-    
-    // Simula o processo de análise
-    setTimeout(() => {
+  const handleStartAnalysis = async (beehive) => {
+    try {
+      setSelectedBeehive(beehive);
+      setIsAnalyzing(true);
+      const user = await getStoredUser();
+      if (!user?.id) throw new Error('Usuário não identificado');
+      // Placeholder: image_path e detection_confidence simulados
+      const image_path = 'app://placeholder.jpg';
+      const detection_confidence = 0.9;
+      const varroa_detected = false;
+      await createHiveAnalysis({ hive_id: beehive.id, user_id: user.id, image_path, varroa_detected, detection_confidence });
       setIsAnalyzing(false);
-      navigation.navigate('AnalysisResult', { beehive, result: 'healthy' });
-    }, 3000);
+      Alert.alert('Análise', 'Análise registrada com sucesso.');
+    } catch (e) {
+      setIsAnalyzing(false);
+      Alert.alert('Erro', String(e?.data?.detail || e?.message || 'Falha ao criar análise'));
+    }
   };
 
   const handleQuickAnalysis = () => {
@@ -98,6 +126,16 @@ export default function AnalysisScreen({ navigation }) {
       </View>
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {loading && (
+          <View style={{ padding: 20 }}>
+            <ActivityIndicator />
+          </View>
+        )}
+        {!!error && !loading && (
+          <View style={{ padding: 20 }}>
+            <Text style={{ color: '#f44336' }}>{String(error)}</Text>
+          </View>
+        )}
         
         {/* Lista de Colmeias para Análise */}
         <View style={styles.beehivesCard}>

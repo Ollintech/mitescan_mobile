@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Alert, Platform, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Alert, Platform, Image, ActivityIndicator } from 'react-native';
+import { getStoredUser, updateHive, deleteHive } from '../api/client';
 
 const { width } = Dimensions.get('window');
 
@@ -118,19 +119,35 @@ export default function BeehiveEditScreen({ navigation, route }) {
             Alert.alert('Erro', 'Por favor, preencha pelo menos o nome e localização da colmeia');
             return;
         }
-        
-        // Lógica REAL de atualização da API aqui
-        
-        Alert.alert(
-            'Sucesso', 
-            'Colmeia atualizada com sucesso!', 
-            [
-                { 
-                    text: 'OK', 
-                    onPress: () => navigation.goBack() 
+        Alert.alert('Confirmar', 'Salvar alterações desta colmeia?', [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Salvar', onPress: async () => {
+              try {
+                const user = await getStoredUser();
+                if (!user?.id || !beehive?.id) throw new Error('Dados insuficientes');
+                // Extrair lat/lng se formato "lat, lng"
+                let location_lat; let location_lng;
+                const parts = String(formData.location).split(',').map(p => parseFloat(p));
+                if (parts.length === 2 && parts.every(n => !Number.isNaN(n))) {
+                  location_lat = parts[0];
+                  location_lng = parts[1];
                 }
-            ]
-        );
+                const update = {
+                  bee_type_id: undefined,
+                  location_lat,
+                  location_lng,
+                  size: formData.capacity ? Number(formData.capacity) : undefined,
+                  humidity: undefined,
+                  temperature: undefined,
+                };
+                await updateHive(user.id, beehive.id, update);
+                Alert.alert('Sucesso', 'Colmeia atualizada com sucesso!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+              } catch (e) {
+                Alert.alert('Erro', String(e?.data?.detail || e?.message || 'Falha ao atualizar colmeia'));
+              }
+            }
+          }
+        ]);
     };
 
     const handleDelete = () => {
@@ -142,11 +159,15 @@ export default function BeehiveEditScreen({ navigation, route }) {
                 { 
                     text: 'Excluir', 
                     style: 'destructive',
-                    onPress: () => {
-                        // Lógica REAL de exclusão da API aqui
-                        Alert.alert('Sucesso', 'Colmeia excluída com sucesso!', [
-                            { text: 'OK', onPress: () => navigation.goBack() }
-                        ]);
+                    onPress: async () => {
+                      try {
+                        const user = await getStoredUser();
+                        if (!user?.id || !beehive?.id) throw new Error('Dados insuficientes');
+                        await deleteHive(user.id, beehive.id, { confirm: true });
+                        Alert.alert('Sucesso', 'Colmeia excluída com sucesso!', [{ text: 'OK', onPress: () => navigation.goBack() }]);
+                      } catch (e) {
+                        Alert.alert('Erro', String(e?.data?.detail || e?.message || 'Falha ao excluir colmeia'));
+                      }
                     }
                 }
             ]

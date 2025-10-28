@@ -1,74 +1,42 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import { listHiveAnalyses } from '../api/client';
 
 const { width } = Dimensions.get('window');
 
 export default function HistoryScreen({ navigation }) {
   const [selectedFilter, setSelectedFilter] = useState('all');
-  
-  // Dados mockados do histórico de análises
-  const [analyses] = useState([
-    {
-      id: 1,
-      beehiveName: 'Colmeia A1',
-      date: '2024-01-15',
-      time: '14:30',
-      result: 'healthy',
-      confidence: '95%',
-      analyst: 'João Silva',
-      notes: 'Colmeia em excelente estado'
-    },
-    {
-      id: 2,
-      beehiveName: 'Colmeia B2',
-      date: '2024-01-14',
-      time: '16:45',
-      result: 'warning',
-      confidence: '87%',
-      analyst: 'Maria Santos',
-      notes: 'Possível infestação de ácaros'
-    },
-    {
-      id: 3,
-      beehiveName: 'Colmeia C3',
-      date: '2024-01-13',
-      time: '09:15',
-      result: 'healthy',
-      confidence: '92%',
-      analyst: 'Pedro Costa',
-      notes: 'Colmeia saudável'
-    },
-    {
-      id: 4,
-      beehiveName: 'Colmeia D4',
-      date: '2024-01-12',
-      time: '11:20',
-      result: 'critical',
-      confidence: '78%',
-      analyst: 'Ana Oliveira',
-      notes: 'Infestação severa detectada'
-    },
-    {
-      id: 5,
-      beehiveName: 'Colmeia E5',
-      date: '2024-01-11',
-      time: '13:00',
-      result: 'healthy',
-      confidence: '94%',
-      analyst: 'Carlos Ferreira',
-      notes: 'Estado ótimo da colmeia'
-    },
-    {
-      id: 6,
-      beehiveName: 'Colmeia A1',
-      date: '2024-01-10',
-      time: '15:30',
-      result: 'healthy',
-      confidence: '91%',
-      analyst: 'João Silva',
-      notes: 'Manutenção preventiva realizada'
-    }
-  ]);
+  const [analyses, setAnalyses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  // const MOCK_ANALYSES = [ ... ] // manter mocks aqui se quiser
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await listHiveAnalyses();
+        const normalized = data.map(a => ({
+          id: a.id,
+          beehiveName: `Colmeia #${a.hive_id}`,
+          date: new Date(a.created_at).toISOString().slice(0, 10),
+          time: new Date(a.created_at).toISOString().slice(11, 16),
+          result: a.varroa_detected ? 'critical' : 'healthy',
+          confidence: `${Math.round((a.detection_confidence || 0) * 100)}%`,
+          analyst: '—',
+          notes: '',
+        }));
+        if (mounted) setAnalyses(normalized);
+      } catch (e) {
+        if (mounted) setError(e?.data?.detail || e?.message || 'Erro ao carregar histórico');
+        // if (mounted) setAnalyses(MOCK_ANALYSES);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const getResultColor = (result) => {
     switch (result) {
@@ -127,6 +95,16 @@ export default function HistoryScreen({ navigation }) {
       </View>
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {loading && (
+          <View style={{ padding: 20 }}>
+            <ActivityIndicator />
+          </View>
+        )}
+        {!!error && !loading && (
+          <View style={{ padding: 20 }}>
+            <Text style={{ color: '#f44336' }}>{String(error)}</Text>
+          </View>
+        )}
         {/* Estatísticas */}
         <View style={styles.statsCard}>
           <View style={styles.statItem}>

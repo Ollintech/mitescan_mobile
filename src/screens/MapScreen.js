@@ -1,184 +1,112 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert, ActivityIndicator } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 
 const { width, height } = Dimensions.get('window');
 
 export default function MapScreen({ navigation, route }) {
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  
-  // Verifica se é uma tela de seleção de localização
+  const [selectedCoord, setSelectedCoord] = useState(null);
+  const [initialRegion, setInitialRegion] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const isLocationSelection = route.params?.onLocationSelect;
-  
-  // Dados mockados das colmeias no mapa
-  const beehiveLocations = [
-    { id: 1, name: 'Colmeia A1', x: width * 0.3, y: height * 0.4, status: 'healthy' },
-    { id: 2, name: 'Colmeia B2', x: width * 0.6, y: height * 0.3, status: 'warning' },
-    { id: 3, name: 'Colmeia C3', x: width * 0.2, y: height * 0.6, status: 'healthy' },
-    { id: 4, name: 'Colmeia D4', x: width * 0.7, y: height * 0.7, status: 'critical' },
-    { id: 5, name: 'Colmeia E5', x: width * 0.5, y: height * 0.5, status: 'healthy' },
-  ];
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'healthy': return '#4CAF50';
-      case 'warning': return '#FF9800';
-      case 'critical': return '#F44336';
-      default: return '#999';
-    }
-  };
+  // MOCK beehives no mapa (comentado - pode ativar se quiser)
+  // const beehiveLocations = [
+  //   { id: 1, name: 'Colmeia A1', latitude: -23.55, longitude: -46.63, status: 'healthy' },
+  // ];
 
-  const handleLocationPress = (location) => {
-    if (isLocationSelection) {
-      // Se for seleção de localização, seleciona o ponto
-      setSelectedLocation(location);
-    } else {
-      // Comportamento normal da tela de mapa
-      setSelectedLocation(location);
-      Alert.alert(
-        location.name,
-        `Status: ${location.status === 'healthy' ? 'Saudável' : location.status === 'warning' ? 'Atenção' : 'Crítica'}`,
-        [
-          { text: 'Ver Detalhes', onPress: () => navigation.navigate('BeehiveEdit', { beehive: { id: location.id, name: location.name } }) },
-          { text: 'Fechar', style: 'cancel' }
-        ]
-      );
-    }
-  };
+  useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setInitialRegion({
+            latitude: -14.2350,
+            longitude: -51.9253,
+            latitudeDelta: 20,
+            longitudeDelta: 20,
+          });
+          setLoading(false);
+          return;
+        }
+        const current = await Location.getCurrentPositionAsync({});
+        setInitialRegion({
+          latitude: current.coords.latitude,
+          longitude: current.coords.longitude,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        });
+      } catch (e) {
+        setInitialRegion({
+          latitude: -14.2350,
+          longitude: -51.9253,
+          latitudeDelta: 20,
+          longitudeDelta: 20,
+        });
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
-  const handleMapPress = (event) => {
-    if (isLocationSelection) {
-      // Calcula as coordenadas baseadas na posição do toque
-      const { locationX, locationY } = event.nativeEvent;
-      const coordinates = {
-        latitude: (locationY / height) * 100, // Coordenadas mockadas
-        longitude: (locationX / width) * 100
-      };
-      
-      // Endereço mockado baseado na posição
-      const address = `Localização selecionada (${coordinates.latitude.toFixed(2)}, ${coordinates.longitude.toFixed(2)})`;
-      
-      setSelectedLocation({ x: locationX, y: locationY, coordinates, address });
-    }
+  const handleLongPress = (e) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    setSelectedCoord({ latitude, longitude });
   };
 
   const handleConfirmLocation = () => {
-    if (selectedLocation && isLocationSelection) {
-      const { coordinates, address } = selectedLocation;
-      route.params.onLocationSelect(coordinates, address);
-      navigation.goBack();
-    }
+    if (!selectedCoord || !isLocationSelection) return;
+    const address = `(${selectedCoord.latitude.toFixed(5)}, ${selectedCoord.longitude.toFixed(5)})`;
+    route.params.onLocationSelect(selectedCoord, address);
+    navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {isLocationSelection ? 'Selecionar Localização' : 'Mapa das Colmeias'}
         </Text>
         {!isLocationSelection && (
-          <TouchableOpacity 
-            style={styles.addButton}
-            onPress={() => navigation.navigate('BeehiveRegister')}
-          >
-            <Text style={styles.addButtonText}>+</Text>
+          <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('BeehiveRegister')}>
+            <Text style={styles.addButtonText}>+</nText>
           </TouchableOpacity>
         )}
       </View>
-      
-      {/* Área do mapa */}
-      <TouchableOpacity 
-        style={styles.mapContainer} 
-        activeOpacity={1}
-        onPress={handleMapPress}
-      >
-        {/* Fundo do mapa */}
-        <View style={styles.mapBackground}>
-          {/* Grade do mapa */}
-          <View style={styles.mapGrid}>
-            {[...Array(10)].map((_, i) => (
-              <View key={i} style={[styles.gridLine, { top: (height * 0.8) * (i / 10) }]} />
-            ))}
-            {[...Array(10)].map((_, i) => (
-              <View key={i} style={[styles.gridLine, { left: (width * 0.8) * (i / 10), top: 0, width: 1, height: height * 0.8 }]} />
-            ))}
+
+      <View style={styles.mapContainer}>
+        {loading || !initialRegion ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <ActivityIndicator />
           </View>
-          
-          {/* Marcadores das colmeias existentes */}
-          {beehiveLocations.map((location) => (
-            <TouchableOpacity
-              key={location.id}
-              style={[
-                styles.beehiveMarker,
-                {
-                  left: location.x - 15,
-                  top: location.y - 15,
-                  backgroundColor: getStatusColor(location.status)
-                }
-              ]}
-              onPress={() => handleLocationPress(location)}
-            >
-              <Text style={styles.markerText}>🏠</Text>
-            </TouchableOpacity>
-          ))}
-          
-          {/* Marcador de localização selecionada */}
-          {selectedLocation && isLocationSelection && (
-            <View style={[
-              styles.selectedLocationMarker,
-              {
-                left: selectedLocation.x - 20,
-                top: selectedLocation.y - 20,
-              }
-            ]}>
-              <Text style={styles.selectedLocationText}>📍</Text>
-            </View>
-          )}
-          
-          {/* Marcador de localização atual */}
-          <View style={styles.currentLocationMarker}>
-            <Text style={styles.currentLocationText}>📍</Text>
-            <Text style={styles.currentLocationLabel}>Você está aqui</Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-      
-      {/* Botão de confirmação para seleção de localização */}
-      {isLocationSelection && selectedLocation && (
-        <View style={styles.confirmationContainer}>
-          <TouchableOpacity 
-            style={styles.confirmButton}
-            onPress={handleConfirmLocation}
+        ) : (
+          <MapView
+            style={styles.map}
+            initialRegion={initialRegion}
+            onLongPress={handleLongPress}
+            showsUserLocation
+            showsMyLocationButton
           >
+            {selectedCoord && (
+              <Marker coordinate={selectedCoord} title="Local selecionado" />
+            )}
+            {/* {beehiveLocations.map(loc => (
+              <Marker key={loc.id} coordinate={{ latitude: loc.latitude, longitude: loc.longitude }} title={loc.name} />
+            ))} */}
+          </MapView>
+        )}
+      </View>
+
+      {isLocationSelection && selectedCoord && (
+        <View style={styles.confirmationContainer}>
+          <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmLocation}>
             <Text style={styles.confirmButtonText}>Confirmar Localização</Text>
           </TouchableOpacity>
-        </View>
-      )}
-      
-      {/* Legenda */}
-      {!isLocationSelection && (
-        <View style={styles.legend}>
-          <Text style={styles.legendTitle}>Legenda</Text>
-          <View style={styles.legendItems}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendIndicator, { backgroundColor: '#4CAF50' }]} />
-              <Text style={styles.legendText}>Saudável</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendIndicator, { backgroundColor: '#FF9800' }]} />
-              <Text style={styles.legendText}>Atenção</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendIndicator, { backgroundColor: '#F44336' }]} />
-              <Text style={styles.legendText}>Crítica</Text>
-            </View>
-          </View>
         </View>
       )}
     </View>
@@ -230,71 +158,9 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-    padding: 20,
   },
-  mapBackground: {
-    backgroundColor: '#e8f5e8',
-    borderRadius: 15,
-    height: height * 0.6,
-    position: 'relative',
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-  },
-  mapGrid: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-  },
-  gridLine: {
-    position: 'absolute',
-    width: '100%',
-    height: 1,
-    backgroundColor: 'rgba(76, 175, 80, 0.2)',
-  },
-  beehiveMarker: {
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  markerText: {
-    fontSize: 16,
-  },
-  currentLocationMarker: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    alignItems: 'center',
-  },
-  currentLocationText: {
-    fontSize: 24,
-  },
-  currentLocationLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 5,
-  },
-  selectedLocationMarker: {
-    position: 'absolute',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderWidth: 2,
-    borderColor: '#FFD700',
-  },
-  selectedLocationText: {
-    fontSize: 24,
-    color: '#FFD700',
+  map: {
+    flex: 1,
   },
   confirmationContainer: {
     position: 'absolute',

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, Alert, ScrollView, Image, ActivityIndicator } from 'react-native';
+import { registerUserRoot } from '../api/client';
 
 const { width, height } = Dimensions.get('window');
 
@@ -9,8 +10,9 @@ export default function RegisterScreen({ navigation }) {
   const [conta, setConta] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // 1. Validação de campos vazios
     if (!name || !email || !password || !confirmPassword || !conta) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
@@ -23,20 +25,21 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
     
-    // 3. Validação de tamanho da senha
-    if (password.length < 6) {
-      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres');
-      return;
+    // 3. Chamada real para API
+    try {
+      setSubmitting(true);
+      // Nota: backend exige access_id (perfil). Use 1 por padrão (owner) ou permita escolher.
+      const access_id = 1;
+      await registerUserRoot({ name, email, password, access_id });
+      Alert.alert('Sucesso', 'Conta criada com sucesso!', [
+        { text: 'OK', onPress: () => navigation.replace('Login') }
+      ]);
+    } catch (e) {
+      const msg = e?.data?.detail || e?.message || 'Falha no cadastro';
+      Alert.alert('Não foi possível cadastrar', String(msg));
+    } finally {
+      setSubmitting(false);
     }
-    
-    // 4. Lógica de registro (Simulação de Sucesso)
-    Alert.alert('Sucesso', 'Conta criada com sucesso!', [
-      { 
-        text: 'OK', 
-        // Redireciona para o Login, substituindo a tela atual (melhor para autenticação)
-        onPress: () => navigation.replace('Login') 
-      } 
-    ]);
   };
 
   return (
@@ -139,9 +142,13 @@ export default function RegisterScreen({ navigation }) {
           </View>
           
           {/* Botão CADASTRAR */}
-          <TouchableOpacity style={styles.enterButton} onPress={handleRegister}>
+          <TouchableOpacity style={styles.enterButton} onPress={handleRegister} disabled={submitting}>
             <View style={styles.gradientButton}>
-              <Text style={styles.enterButtonText}>CADASTRAR</Text>
+              {submitting ? (
+                <ActivityIndicator color="#000" />
+              ) : (
+                <Text style={styles.enterButtonText}>CADASTRAR</Text>
+              )}
             </View>
           </TouchableOpacity>
           
