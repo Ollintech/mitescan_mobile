@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions, Image } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Dimensions, Image, ActivityIndicator, Alert } from 'react-native';
+import { loginRoot, saveAuth } from '../api/client';
 
 const { width, height } = Dimensions.get('window');
 
@@ -7,17 +8,28 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [conta, setConta] = useState('');
   const [password, setPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleLogin = () => {
-    // Simulação de login - A sua lógica atual tem um erro: 'login' não está definido.
-    // Presumindo que você queira usar 'email' e 'password' (ou 'conta' e 'password')
-    // Corrigi para usar 'email' (que é um campo de login) e 'password'.
-    if (email && password) {
-      // navigation.replace é usado para substituir a tela atual na pilha
-      navigation.replace('MainTabs'); 
-    } else {
-      // Opcional: Adicionar feedback ao usuário se os campos estiverem vazios
-      console.log('Preencha email e senha para logar.');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Campos obrigatórios', 'Preencha email e senha para logar.');
+      return;
+    }
+    try {
+      setSubmitting(true);
+      const result = await loginRoot({ email, password });
+      const token = result?.access_token;
+      const user = result?.user_root;
+      if (!token || !user) {
+        throw new Error('Resposta inválida do servidor');
+      }
+      await saveAuth({ token, user });
+      navigation.replace('MainTabs');
+    } catch (e) {
+      const msg = e?.data?.detail || e?.message || 'Falha no login';
+      Alert.alert('Não foi possível entrar', String(msg));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -92,9 +104,13 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         {/* Botão ENTRAR */}
-        <TouchableOpacity style={styles.enterButton} onPress={handleLogin}>
+        <TouchableOpacity style={styles.enterButton} onPress={handleLogin} disabled={submitting}>
           <View style={styles.gradientButton}>
-            <Text style={styles.enterButtonText}>ENTRAR</Text>
+            {submitting ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.enterButtonText}>ENTRAR</Text>
+            )}
           </View>
         </TouchableOpacity>
 
