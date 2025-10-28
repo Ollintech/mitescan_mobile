@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Dimensions, Animated, Easing, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -61,9 +62,18 @@ export default function LoadingScreen({ navigation }) {
 
     animationSequence();
 
-    // Navega para o login após 4 segundos
-    const timer = setTimeout(() => {
-      navigation.replace('Login');
+    // Navega após 4 segundos, checando token salvo
+    const timer = setTimeout(async () => {
+      try {
+        const token = await AsyncStorage.getItem('auth_token');
+        if (token) {
+          navigation.replace('MainTabs');
+        } else {
+          navigation.replace('Login');
+        }
+      } catch (e) {
+        navigation.replace('Login');
+      }
     }, 4000);
 
     return () => clearTimeout(timer);
