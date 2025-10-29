@@ -116,36 +116,12 @@ export default function HistoryScreen({ navigation }) {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>Histórico de Análises</Text>
         <View style={styles.placeholder} />
       </View>
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Estatísticas */}
-        <View style={styles.statsCard}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.total}</Text>
-            <Text style={styles.statLabel}>Total</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.healthy}</Text>
-            <Text style={styles.statLabel}>Saudáveis</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.warning}</Text>
-            <Text style={styles.statLabel}>Atenção</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.critical}</Text>
-            <Text style={styles.statLabel}>Críticas</Text>
-          </View>
-        </View>
+
         
         {/* Filtros */}
         <View style={styles.filtersCard}>

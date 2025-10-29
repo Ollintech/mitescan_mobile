@@ -1,504 +1,342 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Alert, Platform, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Image, Modal } from 'react-native';
+import HeaderBanner from '../components/HeaderBanner';
 
 const { width } = Dimensions.get('window');
 
-// Componente do Header customizado (Baseado na imagem Minhas Colmeias)
-const CustomHeader = ({ navigation, title }) => (
-    <View style={headerStyles.header}>
-        {/* Container para Seta de Retorno e Título */}
-        <View style={headerStyles.headerContent}>
-            <TouchableOpacity 
-                onPress={() => navigation.goBack()} 
-                style={headerStyles.backButton}
-            >
-                {/* Seta de retorno <- */}
-                <Text style={headerStyles.backIcon}>←</Text>
-            </TouchableOpacity>
-            
-            <Text style={headerStyles.title}>{title}</Text>
-        </View>
-
-        {/* Botão Adicionar (ou Editar) - Usei um ícone de caneta para edição */}
-        <TouchableOpacity style={headerStyles.addButton}>
-             <Text style={headerStyles.addText}>✎</Text>
-        </TouchableOpacity>
-    </View>
-);
-
-const headerStyles = StyleSheet.create({
-    header: {
-        backgroundColor: '#FFD700', // Amarelo do design
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: 50, // Ajuste para status bar
-        paddingBottom: 15,
-        elevation: 0, // Remove a sombra padrão do header, se houver
-    },
-    headerContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    backButton: {
-        paddingRight: 15,
-        paddingVertical: 5,
-    },
-    backIcon: {
-        fontSize: 30,
-        color: '#333',
-        fontWeight: '300',
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    addButton: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 8,
-        paddingHorizontal: 15,
-        paddingVertical: 5,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-    },
-    addText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-});
-
 export default function BeehiveEditScreen({ navigation, route }) {
-    // Desestrutura o objeto beehive recebido via navegação
-    const { beehive } = route.params || {};
-    
     const [formData, setFormData] = useState({
-        name: 'COLMEIA 1', // Mock data para visualização
-        location: '-24.708450, -48.002531', // Mock data
-        description: 'Colmeia do apiário sul, instalada sob sombra parcial.',
-        type: 'Bombus Temarius', // Mock data
-        capacity: '10', 
-        installationDate: '10/05/2023',
-        status: 'healthy',
-        notes: ''
+        name: route.params?.beehive?.name || 'COLMEIA 1',
+        size: 'GRANDE',
+        type: 'BOMBUS TEMARIUS',
+        location: route.params?.beehive?.location || '',
+        camera: ''
     });
 
-    // Popula o formulário com os dados da colmeia quando o componente é montado ou 'beehive' muda
-    useEffect(() => {
-        if (beehive) {
-            setFormData({
-                name: beehive.name || '',
-                location: beehive.location || '',
-                description: beehive.description || '',
-                type: beehive.type || '',
-                capacity: beehive.capacity ? String(beehive.capacity) : '', 
-                installationDate: beehive.installationDate || '',
-                status: beehive.status || 'healthy',
-                notes: beehive.notes || ''
-            });
-        }
-        // Remove o header nativo para usar o customizado
-        navigation.setOptions({ headerShown: false });
-    }, [beehive, navigation]);
+    const [showSizeModal, setShowSizeModal] = useState(false);
+    const [showTypeModal, setShowTypeModal] = useState(false);
 
-    const handleInputChange = (field, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
+    const sizes = ['PEQUENA', 'MÉDIA', 'GRANDE'];
+    const types = ['APIS MELLIFERA', 'BOMBUS TEMARIUS', 'TRIGONA SPINIPES'];
 
-    const handleSave = () => {
-        if (!formData.name || !formData.location) {
-            Alert.alert('Erro', 'Por favor, preencha pelo menos o nome e localização da colmeia');
-            return;
-        }
-        
-        // Lógica REAL de atualização da API aqui
-        
-        Alert.alert(
-            'Sucesso', 
-            'Colmeia atualizada com sucesso!', 
-            [
-                { 
-                    text: 'OK', 
-                    onPress: () => navigation.goBack() 
-                }
-            ]
-        );
+    const handleConfirm = () => {
+        console.log('Dados da colmeia:', formData);
+        navigation.goBack();
     };
-
-    const handleDelete = () => {
-        Alert.alert(
-            'Excluir Colmeia',
-            `Tem certeza que deseja excluir a colmeia "${formData.name}"?`,
-            [
-                { text: 'Cancelar', style: 'cancel' },
-                { 
-                    text: 'Excluir', 
-                    style: 'destructive',
-                    onPress: () => {
-                        // Lógica REAL de exclusão da API aqui
-                        Alert.alert('Sucesso', 'Colmeia excluída com sucesso!', [
-                            { text: 'OK', onPress: () => navigation.goBack() }
-                        ]);
-                    }
-                }
-            ]
-        );
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'healthy': return '#4CAF50';
-            case 'warning': return '#FF9800';
-            case 'critical': return '#F44336';
-            default: return '#999';
-        }
-    };
-    
-    // Função para renderizar o padrão de fundo (hexágonos cinzas)
-    const renderBackgroundPattern = () => (
-        <View style={styles.backgroundPattern}>
-            {[...Array(10)].map((_, i) => (
-                <Text key={i} style={styles.hexIcon}>⬢</Text>
-            ))}
-        </View>
-    );
 
     return (
         <View style={styles.container}>
-            
-            {/* 1. Header Customizado no estilo da imagem */}
-            <CustomHeader 
-                navigation={navigation} 
-                title={'MINHAS COLMEIAS'} 
-            />
-            
-            {/* 2. ScrollView principal com padrão de fundo */}
+            {/* Header com Banner */}
+            <HeaderBanner />
+
+            {/* Área de conteúdo branca com padrão hexagonal */}
             <ScrollView 
-                contentContainerStyle={styles.scrollContainer}
+                style={styles.contentArea}
+                contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
             >
-                {/* Padrão de hexágonos no fundo do ScrollView */}
-                {renderBackgroundPattern()}
+                {/* Card branco centralizado */}
+                <View style={styles.card}>
+                    {/* Barra de título com botão de voltar */}
+                    <View style={styles.titleBar}>
+                        <TouchableOpacity 
+                            onPress={() => navigation.goBack()}
+                            style={styles.backButton}
+                        >
+                            <Text style={styles.backIcon}>←</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.cardTitle}>EDITAR DADOS DA COLMEIA</Text>
+                    </View>
 
-                {/* Card de Detalhes da Colmeia (Simulando o Card da imagem, mas adaptado para edição) */}
-                <View style={styles.infoCard}>
-                    <Image 
-                        source={{ uri: 'https://via.placeholder.com/100x120.png?text=Abelha' }} 
-                        style={styles.beehiveImage} 
-                    />
-                    <View style={styles.infoDetails}>
-                        <Text style={styles.cardTitle}>{formData.name}</Text>
-                        <View style={styles.detailRow}>
-                            <Text style={styles.detailIcon}>🐝</Text>
-                            <Text style={styles.detailText}>{formData.type}</Text>
-                        </View>
-                        <View style={styles.detailRow}>
-                            <Text style={styles.detailIcon}>📍</Text>
-                            <Text style={styles.detailText}>{formData.location}</Text>
-                        </View>
+                    {/* Ícone de abelha e instrução */}
+                    <View style={styles.instructionContainer}>
+                        <Image 
+                            source={require('../../assets/icon-bee.png')} 
+                            style={styles.instructionBeeIcon}
+                            resizeMode="contain"
+                        />
+                        <Text style={styles.instructionText}>PREENCHA AS INFORMAÇÕES ABAIXO</Text>
                     </View>
-                    
-                    {/* Status lateral - Adaptado para a tela de edição */}
-                    <View style={[styles.statusBox, { borderColor: getStatusColor(formData.status) }]}>
-                        <Text style={styles.statusBoxTitle}>ESTADO</Text>
-                        <Text style={[styles.statusBoxText, { color: getStatusColor(formData.status) }]}>
-                            {formData.status === 'healthy' ? 'SEGURA' : 'PERIGO'}
-                        </Text>
-                    </View>
-                </View>
-                
-                {/* Formulário de Edição (Mantido com estilos limpos) */}
-                <View style={styles.formCard}>
-                    <Text style={styles.formCardTitle}>Editar Informações</Text>
-                    
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Nome da Colmeia *</Text>
+
+                    {/* Campo Nome */}
+                    <View style={styles.fieldContainer}>
+                        <Text style={styles.fieldLabel}>Nome:</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Nome da colmeia"
-                            placeholderTextColor="#999"
                             value={formData.name}
-                            onChangeText={(value) => handleInputChange('name', value)}
-                        />
-                    </View>
-                    
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Tipo da Abelha</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Ex: Apis Mellifera"
-                            placeholderTextColor="#999"
-                            value={formData.type}
-                            onChangeText={(value) => handleInputChange('type', value)}
+                            onChangeText={(text) => setFormData({ ...formData, name: text })}
                         />
                     </View>
 
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Localização * (Coordenadas)</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="-XX.XXXXXX, -YY.YYYYYY"
-                            placeholderTextColor="#999"
-                            value={formData.location}
-                            onChangeText={(value) => handleInputChange('location', value)}
-                        />
+                    {/* Campo Tamanho - Dropdown */}
+                    <View style={styles.fieldContainer}>
+                        <Text style={styles.fieldLabel}>Tamanho:</Text>
+                        <TouchableOpacity 
+                            style={styles.dropdownInput}
+                            onPress={() => setShowSizeModal(true)}
+                        >
+                            <Text style={styles.dropdownText}>{formData.size}</Text>
+                            <Text style={styles.dropdownArrow}>▼</Text>
+                        </TouchableOpacity>
                     </View>
-                    
-                    {/* Botões de status adaptados para a aparência final */}
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Status Manual (para testes)</Text>
-                        <View style={styles.statusButtons}>
-                            {['healthy', 'warning', 'critical'].map(s => (
-                                <TouchableOpacity 
-                                    key={s}
-                                    style={[
-                                        styles.statusButtonFinal, 
-                                        formData.status === s && { backgroundColor: getStatusColor(s), borderColor: getStatusColor(s) }
-                                    ]}
-                                    onPress={() => handleInputChange('status', s)}
-                                >
-                                    <Text style={[
-                                        styles.statusButtonTextFinal,
-                                        formData.status === s && { color: 'white' }
-                                    ]}>
-                                        {s === 'healthy' ? 'Saudável' : s === 'warning' ? 'Atenção' : 'Crítica'}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
+
+                    {/* Campo Tipo de Abelha - Dropdown */}
+                    <View style={styles.fieldContainer}>
+                        <Text style={styles.fieldLabel}>Tipo de Abelha:</Text>
+                        <TouchableOpacity 
+                            style={styles.dropdownInput}
+                            onPress={() => setShowTypeModal(true)}
+                        >
+                            <Text style={styles.dropdownText}>{formData.type}</Text>
+                            <Text style={styles.dropdownArrow}>▼</Text>
+                        </TouchableOpacity>
                     </View>
-                    
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Observações</Text>
-                        <TextInput
-                            style={[styles.input, styles.textArea]}
-                            placeholder="Observações sobre a colmeia..."
-                            placeholderTextColor="#999"
-                            value={formData.notes}
-                            onChangeText={(value) => handleInputChange('notes', value)}
-                            multiline
-                            numberOfLines={4}
-                        />
+
+                    {/* Campo Localização */}
+                    <View style={styles.fieldContainer}>
+                        <Text style={styles.fieldLabel}>Localização:</Text>
+                        <TouchableOpacity 
+                            style={styles.actionInput}
+                            onPress={() => console.log('Definir localização')}
+                        >
+                            <Text style={styles.actionInputText}>Clique aqui para definir localização</Text>
+                        </TouchableOpacity>
                     </View>
-                </View>
-                
-                {/* Botões de ação Final */}
-                <View style={styles.actionButtons}>
-                    <TouchableOpacity 
-                        style={[styles.actionButton, styles.deleteButtonFinal]}
-                        onPress={handleDelete}
-                    >
-                        <Text style={styles.deleteButtonTextFinal}>🗑️ EXCLUIR</Text>
-                    </TouchableOpacity>
-                    
-                    <TouchableOpacity 
-                        style={[styles.actionButton, styles.saveButtonFinal]}
-                        onPress={handleSave}
-                    >
-                        <Text style={styles.saveButtonTextFinal}>SALVAR</Text>
+
+                    {/* Campo Câmera */}
+                    <View style={styles.fieldContainer}>
+                        <Text style={styles.fieldLabel}>Câmera:</Text>
+                        <TouchableOpacity 
+                            style={styles.actionInput}
+                            onPress={() => navigation.navigate('Camera')}
+                        >
+                            <Text style={styles.actionInputText}>Clique aqui para definir a câmera</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Botão Confirmar */}
+                    <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+                        <Text style={styles.confirmButtonText}>CONFIRMAR</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
+
+            {/* Modal para seleção de Tamanho */}
+            <Modal
+                visible={showSizeModal}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setShowSizeModal(false)}
+            >
+                <TouchableOpacity 
+                    style={styles.modalOverlay}
+                    activeOpacity={1}
+                    onPress={() => setShowSizeModal(false)}
+                >
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Selecione o Tamanho</Text>
+                        {sizes.map((size, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.modalOption}
+                                onPress={() => {
+                                    setFormData({ ...formData, size });
+                                    setShowSizeModal(false);
+                                }}
+                            >
+                                <Text style={styles.modalOptionText}>{size}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </TouchableOpacity>
+            </Modal>
+
+            {/* Modal para seleção de Tipo de Abelha */}
+            <Modal
+                visible={showTypeModal}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setShowTypeModal(false)}
+            >
+                <TouchableOpacity 
+                    style={styles.modalOverlay}
+                    activeOpacity={1}
+                    onPress={() => setShowTypeModal(false)}
+                >
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Selecione o Tipo de Abelha</Text>
+                        {types.map((type, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.modalOption}
+                                onPress={() => {
+                                    setFormData({ ...formData, type });
+                                    setShowTypeModal(false);
+                                }}
+                            >
+                                <Text style={styles.modalOptionText}>{type}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </TouchableOpacity>
+            </Modal>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1, 
-        backgroundColor: '#383838', // Fundo externo cinza escuro
+        flex: 1,
+        backgroundColor: '#FFFFFF',
     },
-    backgroundPattern: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        opacity: 0.1, // Suaviza a visibilidade
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        pointerEvents: 'none', // Garante que o toque passe através
-    },
-    hexIcon: {
-        fontSize: 100,
-        color: '#999', // Cinza para o padrão
-        lineHeight: 80,
-    },
-    scrollContainer: {
-        padding: 20,
-        flexGrow: 1, 
-        backgroundColor: '#f5f5f5', // Fundo da seção de conteúdo branco/claro
-        borderTopLeftRadius: 30, // Curva superior para transição do fundo
-        borderTopRightRadius: 30,
-        marginTop: -20, // Sobrepõe um pouco o header
-        paddingTop: 30,
-        paddingBottom: 100, 
-    },
-    
-    // --- Card de Detalhes (Adaptado da imagem da lista) ---
-    infoCard: {
-        backgroundColor: '#fff',
-        borderRadius: 15,
-        padding: 15,
-        marginBottom: 30,
-        flexDirection: 'row',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 5,
-    },
-    beehiveImage: {
-        width: 100,
-        height: 120,
-        borderRadius: 10,
-        marginRight: 15,
-        resizeMode: 'cover',
-    },
-    infoDetails: {
+    contentArea: {
         flex: 1,
     },
-    detailRow: {
+    scrollContent: {
+        backgroundColor: '#FFFFFF',
+        paddingVertical: 20,
+        alignItems: 'center',
+    },
+    card: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: 25,
+        width: width * 0.9,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 15,
+        elevation: 8,
+    },
+    titleBar: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 5,
+        marginBottom: 20,
     },
-    detailIcon: {
-        fontSize: 16,
-        marginRight: 5,
-        color: '#999',
-    },
-    detailText: {
-        fontSize: 14,
-        color: '#666',
-        fontWeight: '500',
-    },
-    statusBox: {
-        width: 80,
-        height: 100,
-        borderRadius: 10,
-        borderWidth: 2,
+    backButton: {
+        backgroundColor: '#FFC90B',
+        width: 40,
+        height: 40,
+        borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 5,
-        marginLeft: 10,
-        backgroundColor: '#e8f5e9', // Fundo claro para o status
+        marginRight: 10,
     },
-    statusBoxTitle: {
-        fontSize: 10,
+    backIcon: {
+        fontSize: 24,
+        color: '#000000',
         fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 5,
     },
-    statusBoxText: {
+    cardTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#000000',
+        flex: 1,
+    },
+    instructionContainer: {
+        alignItems: 'center',
+        marginBottom: 30,
+    },
+    instructionBeeIcon: {
+        width: 50,
+        height: 50,
+        tintColor: '#000000',
+        marginBottom: 10,
+    },
+    instructionText: {
         fontSize: 14,
-        fontWeight: 'bold',
+        color: '#000000',
+        textAlign: 'center',
     },
-    
-    // --- Formulário de Edição ---
-    formCard: {
-        backgroundColor: '#fff',
-        borderRadius: 15,
-        padding: 20,
-        marginBottom: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    formCardTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-        marginBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        paddingBottom: 10,
-    },
-    inputGroup: {
+    fieldContainer: {
         marginBottom: 20,
     },
-    inputLabel: {
-        fontSize: 14,
+    fieldLabel: {
+        fontSize: 16,
         fontWeight: '600',
-        color: '#333',
+        color: '#000000',
         marginBottom: 8,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#ddd',
+        backgroundColor: '#F5F5F5',
         borderRadius: 10,
-        padding: 15,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
         fontSize: 16,
-        backgroundColor: '#f9f9f9',
+        color: '#000000',
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
     },
-    textArea: {
-        height: 100, 
-        textAlignVertical: 'top', 
-    },
-    statusButtons: {
+    dropdownInput: {
+        backgroundColor: '#F5F5F5',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        gap: 10,
-    },
-    statusButtonFinal: {
-        borderWidth: 2,
-        borderRadius: 10,
-        paddingVertical: 10,
-        flex: 1,
         alignItems: 'center',
-        backgroundColor: '#fff',
     },
-    statusButtonTextFinal: {
+    dropdownText: {
+        fontSize: 16,
+        color: '#000000',
+        flex: 1,
+    },
+    dropdownArrow: {
+        fontSize: 12,
+        color: '#000000',
+        marginLeft: 10,
+    },
+    actionInput: {
+        backgroundColor: '#FFC90B',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        alignItems: 'center',
+    },
+    actionInputText: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#666',
+        color: '#000000',
     },
-    
-    // --- Botões de Ação Final (Fundo Amarelo) ---
-    actionButtons: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 20,
-        marginBottom: 20,
-    },
-    actionButton: {
+    confirmButton: {
+        backgroundColor: '#FFC90B',
         borderRadius: 10,
-        padding: 15,
-        flex: 1,
+        paddingVertical: 15,
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 3,
-        elevation: 4,
+        marginTop: 10,
     },
-    deleteButtonFinal: {
+    confirmButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#000000',
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
         backgroundColor: '#FFFFFF',
-        borderWidth: 1,
-        borderColor: '#F44336',
-        marginRight: 10,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 20,
     },
-    deleteButtonTextFinal: {
-        color: '#F44336',
-        fontSize: 16,
+    modalTitle: {
+        fontSize: 18,
         fontWeight: 'bold',
+        color: '#000000',
+        marginBottom: 20,
+        textAlign: 'center',
     },
-    saveButtonFinal: {
-        backgroundColor: '#FFD700', // Amarelo principal
+    modalOption: {
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
     },
-    saveButtonTextFinal: {
-        color: '#333',
+    modalOptionText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        color: '#000000',
     },
 });

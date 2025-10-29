@@ -13,6 +13,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import BeehiveListScreen from './src/screens/BeehiveListScreen';
 import BeehiveEditScreen from './src/screens/BeehiveEditScreen';
 import BeehiveRegisterScreen from './src/screens/BeehiveRegisterScreen';
+import BeehiveDeleteScreen from './src/screens/BeehiveDeleteScreen';
 import MapScreen from './src/screens/MapScreen';
 import CameraScreen from './src/screens/CameraScreen';
 import AnalysisScreen from './src/screens/AnalysisScreen';
@@ -288,6 +289,8 @@ export default function App() {
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen name="BeehiveRegister" component={BeehiveRegisterScreen} />
         <Stack.Screen name="BeehiveEdit" component={BeehiveEditScreen} />
+        <Stack.Screen name="BeehiveDelete" component={BeehiveDeleteScreen} />
+        <Stack.Screen name="Map" component={MapScreen} />
         <Stack.Screen name="Camera" component={CameraScreen} />
         <Stack.Screen name="History" component={HistoryScreen} />
         <Stack.Screen name="UserEdit" component={UserEditScreen} />

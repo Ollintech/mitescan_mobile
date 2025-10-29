@@ -83,21 +83,7 @@ export default function BeehiveListScreen({ navigation }) {
   };
 
   const handleDeleteBeehive = (beehive) => {
-    Alert.alert(
-      'Excluir Colmeia',
-      `Tem certeza que deseja excluir a colmeia "${beehive.name}"?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { 
-          text: 'Excluir', 
-          style: 'destructive',
-          onPress: () => {
-            // Lógica de exclusão da colmeia
-            Alert.alert('Sucesso', 'Colmeia excluída com sucesso!');
-          }
-        }
-      ]
-    );
+    navigation.navigate('BeehiveDelete', { beehive });
   };
 
   const filteredBeehives = beehives.filter(beehive =>
@@ -110,17 +96,36 @@ export default function BeehiveListScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Minhas Colmeias</Text>
-        <TouchableOpacity 
-          style={styles.addButton}
-          onPress={() => navigation.navigate('BeehiveRegister')}
-        >
-          {/* ÍCONE DE ADICIONAR: create-icon.png */}
-          <Image
-            source={require('../../assets/create-icon.png')} 
-            style={styles.addButtonIcon}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+        <View style={styles.headerButtons}>
+          {/* Botão Mapa */}
+          <TouchableOpacity 
+            style={styles.headerActionButton}
+            onPress={() => navigation.navigate('Map')}
+          >
+            <Text style={styles.headerActionButtonText}>🗺️</Text>
+          </TouchableOpacity>
+          
+          {/* Botão Câmera */}
+          <TouchableOpacity 
+            style={styles.headerActionButton}
+            onPress={() => navigation.navigate('Camera')}
+          >
+            <Text style={styles.headerActionButtonText}>📷</Text>
+          </TouchableOpacity>
+          
+          {/* Botão Adicionar */}
+          <TouchableOpacity 
+            style={styles.addButton}
+            onPress={() => navigation.navigate('BeehiveRegister')}
+          >
+            {/* ÍCONE DE ADICIONAR: create-icon.png */}
+            <Image
+              source={require('../../assets/create-icon.png')} 
+              style={styles.addButtonIcon}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       
       {/* Barra de pesquisa */}
@@ -247,8 +252,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  headerActionButton: {
+    backgroundColor: '#333',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerActionButtonText: {
+    fontSize: 20,
+  },
   addButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '',
     width: 40,
     height: 40,
     borderRadius: 20,

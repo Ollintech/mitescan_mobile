@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#FFC90B',
-    opacity: 0.6,
+    opacity: 0.7,
   },
 
   loginCard: {

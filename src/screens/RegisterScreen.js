@@ -70,7 +70,14 @@ export default function RegisterScreen({ navigation }) {
           </View>
 
           {/* Título Cadastro */}
-          <Text style={styles.loginTitle}>Cadastro</Text>
+          <Text style={styles.loginTitle}>Cadastrar-se</Text>
+          
+          {/* Texto explicativo */}
+          <View style={styles.explanationContainer}>
+            <Text style={styles.explanationText}>
+              Este será o <Text style={styles.boldText}>usuário principal (root)</Text> da conta. Com ele, você poderá acessar o sistema e <Text style={styles.boldText}>criar acessos individuais</Text> para sua equipe ou colaboradores.
+            </Text>
+          </View>
           
           {/* Nome completo */}
           <View style={styles.inputContainer}>
@@ -108,19 +115,6 @@ export default function RegisterScreen({ navigation }) {
               placeholderTextColor="#999"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
-          
-          {/* Confirmar senha */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.inputLabel}>Confirmar senha:</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Confirme sua senha"
-              placeholderTextColor="#999"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
               secureTextEntry
             />
           </View>
@@ -174,7 +168,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: '#FFC90B',
-    opacity: 0.6,
+    opacity: 0.7,
   },
   // AJUSTE VERTICAL: paddingVertical mínimo
   scrollContainer: {
@@ -225,6 +219,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000000',
     marginBottom: 15, 
+  },
+  
+  explanationContainer: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  explanationText: {
+    fontSize: 14,
+    color: '#000000',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  boldText: {
+    fontWeight: 'bold',
   },
   
   // AJUSTE VERTICAL: Espaçamento entre inputs reduzido

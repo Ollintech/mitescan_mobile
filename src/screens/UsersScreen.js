@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Dimensions, Alert, Image } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { Ionicons, Feather } from '@expo/vector-icons'; // Importação da biblioteca de ícones
 
@@ -137,8 +137,12 @@ export default function UsersScreen({ navigation }) {
                         style={styles.logoutButton}
                         onPress={handleLogout}
                     >
-                        {/* Ícone de Sair */}
-                        <Text style={styles.logoutButtonText}>🚪</Text>
+                        {/* Ícone de Sair - log-out.png */}
+                        <Image 
+                            source={require('../../assets/log-out.png')} 
+                            style={styles.logoutIconImage}
+                            resizeMode="contain"
+                        />
                     </TouchableOpacity>
                     
                     {/* Botão ADICIONAR (create-icon) */}
@@ -146,8 +150,12 @@ export default function UsersScreen({ navigation }) {
                         style={styles.addButton}
                         onPress={handleAddUser}
                     >
-                        {/* Substituindo o texto '+' pelo ícone create-icon */}
-                        <Ionicons name="add-circle-outline" size={30} color="#333" />
+                        {/* Ícone create-icon */}
+                        <Image 
+                            source={require('../../assets/create-icon.png')} 
+                            style={styles.createIcon}
+                            resizeMode="contain"
+                        />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -253,21 +261,20 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     logoutButton: {
-        backgroundColor: '#FF6B3b',
+        backgroundColor: '',
         width: 40,
         height: 40,
-        borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.22,
-        shadowRadius: 2.22,
     },
     logoutButtonText: {
         fontSize: 18,
         color: '#FFFFFF',
+    },
+    logoutIconImage: {
+        width: 30,
+        height: 30,
+        tintColor: '#000000',
     },
     // Ajuste para acomodar o ícone maior
     addButton: {
@@ -277,7 +284,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    // Removido addButtonText, pois o ícone é o elemento principal agora
+    createIcon: {
+        width: 30,
+        height: 30,
+        tintColor: '#333',
+    },
     
     searchContainer: {
         backgroundColor: '#fff',

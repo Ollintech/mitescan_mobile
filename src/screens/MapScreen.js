@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert, ScrollView, Image } from 'react-native';
+import HeaderBanner from '../components/HeaderBanner';
 
 const { width, height } = Dimensions.get('window');
 
@@ -9,13 +10,13 @@ export default function MapScreen({ navigation, route }) {
   // Verifica se é uma tela de seleção de localização
   const isLocationSelection = route.params?.onLocationSelect;
   
-  // Dados mockados das colmeias no mapa
+  // Dados mockados das colmeias no mapa (posições em porcentagem)
   const beehiveLocations = [
-    { id: 1, name: 'Colmeia A1', x: width * 0.3, y: height * 0.4, status: 'healthy' },
-    { id: 2, name: 'Colmeia B2', x: width * 0.6, y: height * 0.3, status: 'warning' },
-    { id: 3, name: 'Colmeia C3', x: width * 0.2, y: height * 0.6, status: 'healthy' },
-    { id: 4, name: 'Colmeia D4', x: width * 0.7, y: height * 0.7, status: 'critical' },
-    { id: 5, name: 'Colmeia E5', x: width * 0.5, y: height * 0.5, status: 'healthy' },
+    { id: 1, name: 'Colmeia A1', x: 25, y: 30, status: 'healthy' },
+    { id: 2, name: 'Colmeia B2', x: 55, y: 25, status: 'warning' },
+    { id: 3, name: 'Colmeia C3', x: 20, y: 50, status: 'healthy' },
+    { id: 4, name: 'Colmeia D4', x: 60, y: 45, status: 'critical' },
+    { id: 5, name: 'Colmeia E5', x: 45, y: 40, status: 'healthy' },
   ];
 
   const getStatusColor = (status) => {
@@ -62,37 +63,40 @@ export default function MapScreen({ navigation, route }) {
   };
 
   const handleConfirmLocation = () => {
-    if (selectedLocation && isLocationSelection) {
+    if (selectedLocation && isLocationSelection && route.params?.onLocationSelect) {
       const { coordinates, address } = selectedLocation;
       route.params.onLocationSelect(coordinates, address);
       navigation.goBack();
+    } else {
+      Alert.alert('Informação', 'Localização: JACUPIRANGA, -24.708450, -48.002531');
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {isLocationSelection ? 'Selecionar Localização' : 'Mapa das Colmeias'}
-        </Text>
-        {!isLocationSelection && (
-          <TouchableOpacity 
-            style={styles.addButton}
-            onPress={() => navigation.navigate('BeehiveRegister')}
-          >
-            <Text style={styles.addButtonText}>+</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+      {/* Header com Banner */}
+      <HeaderBanner />
       
-      {/* Área do mapa */}
+      {/* Área de conteúdo com ScrollView */}
+      <ScrollView 
+        style={styles.contentArea}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Card branco centralizado */}
+        <View style={styles.card}>
+          {/* Barra de título com botão de voltar */}
+          <View style={styles.titleBar}>
+            <TouchableOpacity 
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
+            >
+              <Text style={styles.backIcon}>←</Text>
+            </TouchableOpacity>
+            <Text style={styles.cardTitle}>DEFINIR LOCALIZAÇÃO</Text>
+          </View>
+          
+          {/* Área do mapa */}
       <TouchableOpacity 
         style={styles.mapContainer} 
         activeOpacity={1}
@@ -102,30 +106,30 @@ export default function MapScreen({ navigation, route }) {
         <View style={styles.mapBackground}>
           {/* Grade do mapa */}
           <View style={styles.mapGrid}>
-            {[...Array(10)].map((_, i) => (
-              <View key={i} style={[styles.gridLine, { top: (height * 0.8) * (i / 10) }]} />
+            {[...Array(12)].map((_, i) => (
+              <View key={`h-${i}`} style={[styles.gridLineHorizontal, { top: `${(i * 100) / 12}%` }]} />
             ))}
-            {[...Array(10)].map((_, i) => (
-              <View key={i} style={[styles.gridLine, { left: (width * 0.8) * (i / 10), top: 0, width: 1, height: height * 0.8 }]} />
+            {[...Array(12)].map((_, i) => (
+              <View key={`v-${i}`} style={[styles.gridLineVertical, { left: `${(i * 100) / 12}%` }]} />
             ))}
           </View>
           
           {/* Marcadores das colmeias existentes */}
           {beehiveLocations.map((location) => (
-            <TouchableOpacity
+            <View
               key={location.id}
               style={[
                 styles.beehiveMarker,
                 {
-                  left: location.x - 15,
-                  top: location.y - 15,
-                  backgroundColor: getStatusColor(location.status)
+                  left: `${location.x}%`,
+                  top: `${location.y}%`,
+                  backgroundColor: getStatusColor(location.status),
+                  transform: [{ translateX: -15 }, { translateY: -15 }]
                 }
               ]}
-              onPress={() => handleLocationPress(location)}
             >
               <Text style={styles.markerText}>🏠</Text>
-            </TouchableOpacity>
+            </View>
           ))}
           
           {/* Marcador de localização selecionada */}
@@ -143,44 +147,37 @@ export default function MapScreen({ navigation, route }) {
           
           {/* Marcador de localização atual */}
           <View style={styles.currentLocationMarker}>
-            <Text style={styles.currentLocationText}>📍</Text>
-            <Text style={styles.currentLocationLabel}>Você está aqui</Text>
+            <View style={styles.currentLocationPin}>
+              <Text style={styles.currentLocationText}>📍</Text>
+            </View>
+            <View style={styles.currentLocationBox}>
+              <Text style={styles.currentLocationLabel}>Você está aqui</Text>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
       
-      {/* Botão de confirmação para seleção de localização */}
-      {isLocationSelection && selectedLocation && (
-        <View style={styles.confirmationContainer}>
-          <TouchableOpacity 
-            style={styles.confirmButton}
-            onPress={handleConfirmLocation}
-          >
-            <Text style={styles.confirmButtonText}>Confirmar Localização</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-      
-      {/* Legenda */}
-      {!isLocationSelection && (
-        <View style={styles.legend}>
-          <Text style={styles.legendTitle}>Legenda</Text>
-          <View style={styles.legendItems}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendIndicator, { backgroundColor: '#4CAF50' }]} />
-              <Text style={styles.legendText}>Saudável</Text>
+          {/* Informações de localização */}
+          <View style={styles.locationInfo}>
+            <View style={styles.locationItem}>
+              <Text style={styles.locationIcon}>📍</Text>
+              <Text style={styles.locationText}>JACUPIRANGA</Text>
             </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendIndicator, { backgroundColor: '#FF9800' }]} />
-              <Text style={styles.legendText}>Atenção</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendIndicator, { backgroundColor: '#F44336' }]} />
-              <Text style={styles.legendText}>Crítica</Text>
+            <View style={styles.locationItem}>
+              <Text style={styles.coordinateIcon}>🎯</Text>
+              <Text style={styles.coordinateText}>-24.708450, -48.002531</Text>
             </View>
           </View>
         </View>
-      )}
+        
+        {/* Botão AVANÇAR */}
+        <TouchableOpacity 
+          style={styles.advanceButton}
+          onPress={handleConfirmLocation}
+        >
+          <Text style={styles.advanceButtonText}>AVANÇAR</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
@@ -188,7 +185,32 @@ export default function MapScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF',
+  },
+  contentArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 25,
+    width: width * 0.9,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 15,
+    elevation: 8,
+    marginBottom: 20,
+  },
+  titleBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   header: {
     backgroundColor: '#FFD700',
@@ -202,53 +224,52 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   backButton: {
-    padding: 10,
-  },
-  backButtonText: {
-    fontSize: 24,
-    color: '#333',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-    textAlign: 'center',
-  },
-  addButton: {
-    backgroundColor: '#FFD700',
+    backgroundColor: '#FFC90B',
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 10,
   },
-  addButtonText: {
+  backIcon: {
     fontSize: 24,
+    color: '#000000',
     fontWeight: 'bold',
-    color: '#333',
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+    flex: 1,
   },
   mapContainer: {
-    flex: 1,
-    padding: 20,
+    marginBottom: 10,
   },
   mapBackground: {
-    backgroundColor: '#e8f5e8',
+    backgroundColor: '#FFFFFF',
     borderRadius: 15,
-    height: height * 0.6,
+    height: 280,
     position: 'relative',
     borderWidth: 2,
     borderColor: '#4CAF50',
+    overflow: 'hidden',
   },
   mapGrid: {
     position: 'absolute',
     width: '100%',
     height: '100%',
   },
-  gridLine: {
+  gridLineHorizontal: {
     position: 'absolute',
     width: '100%',
     height: 1,
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+  },
+  gridLineVertical: {
+    position: 'absolute',
+    height: '100%',
+    width: 1,
     backgroundColor: 'rgba(76, 175, 80, 0.2)',
   },
   beehiveMarker: {
@@ -269,17 +290,29 @@ const styles = StyleSheet.create({
   },
   currentLocationMarker: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    bottom: '10%',
+    right: '15%',
     alignItems: 'center',
+    zIndex: 10,
+  },
+  currentLocationPin: {
+    marginBottom: 5,
   },
   currentLocationText: {
-    fontSize: 24,
+    fontSize: 32,
+  },
+  currentLocationBox: {
+    backgroundColor: 'rgba(76, 175, 80, 0.9)',
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   currentLocationLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 5,
+    fontSize: 11,
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   selectedLocationMarker: {
     position: 'absolute',
@@ -356,5 +389,49 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 12,
     color: '#666',
+  },
+  locationInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 15,
+    paddingTop: 15,
+    paddingHorizontal: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  locationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  locationIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  locationText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  coordinateIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  coordinateText: {
+    fontSize: 14,
+    color: '#000000',
+  },
+  advanceButton: {
+    backgroundColor: '#FFC90B',
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: 'center',
+    width: width * 0.9,
+  },
+  advanceButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
   },
 });
